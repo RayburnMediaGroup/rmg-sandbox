@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { artist, releases, shows } from "@/lib/data";
+import { artist, releases, shows, videos } from "@/lib/data";
 import { resolveTokens } from "@/lib/genreTokens";
 import { AudioPlayerProvider } from "@/lib/audioContext";
 import Schema from "@/components/band/Schema";
@@ -7,9 +7,13 @@ import BandTheme from "@/components/band/BandTheme";
 import Navbar from "@/components/band/Navbar";
 import Hero from "@/components/band/Hero";
 import LatestRelease from "@/components/band/LatestRelease";
+import Discography from "@/components/band/Discography";
+import VideoSection from "@/components/band/VideoSection";
 import Shows from "@/components/band/Shows";
 import PressStrip from "@/components/band/PressStrip";
 import AboutSnippet from "@/components/band/AboutSnippet";
+import NewsletterSignup from "@/components/band/NewsletterSignup";
+import MerchTeaser from "@/components/band/MerchTeaser";
 import StreamingFooter from "@/components/band/StreamingFooter";
 import MiniPlayer from "@/components/band/MiniPlayer";
 
@@ -47,13 +51,17 @@ export default function BandPage() {
         <Hero artist={artist} featuredRelease={featuredRelease} />
         <div id="music">
           <LatestRelease release={featuredRelease} />
+          <Discography releases={releases} featuredSlug={featuredRelease.slug} />
+          <VideoSection videos={videos} />
         </div>
         <Shows shows={shows} />
+        <MerchTeaser artist={artist} />
         <PressStrip quotes={artist.pressQuotes} />
         <div id="about">
           <AboutSnippet artist={artist} />
         </div>
         <div id="contact">
+          <NewsletterSignup artist={artist} />
           <StreamingFooter artist={artist} />
         </div>
         <MiniPlayer />

@@ -79,6 +79,7 @@ export interface Artist {
   streamingLinks: StreamingLinks;
   bookingEmail?: string;
   newsletterUrl?: string;
+  merchUrl?: string;
 }
 
 // ─────────────────────────────────────────────
@@ -143,6 +144,7 @@ export const artist: Artist = {
   },
   bookingEmail: "spilloutmusic@yahoo.com",
   newsletterUrl: "https://roughcutsband.com/contact/emailsingup/",
+  merchUrl: "https://roughcutsband.com/store",
 };
 
 // ─────────────────────────────────────────────

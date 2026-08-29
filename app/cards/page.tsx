@@ -78,11 +78,11 @@ export default function CardsPage() {
             <a
               key={card.title}
               href="#"
-              className="group glass-card overflow-hidden rounded-[1.25rem]"
+              className="group glass-card rounded-[1.25rem]"
               style={{ display: "block", textDecoration: "none" }}
             >
               {/* Image wrapper — first child, overflow-hidden — gets top radius from CSS rule */}
-              <div className="overflow-hidden" style={{ aspectRatio: "16/10", position: "relative" }}>
+              <div className="overflow-hidden rounded-t-[1.25rem]" style={{ aspectRatio: "16/10", position: "relative" }}>
                 <img
                   src={card.src}
                   alt={card.alt}
@@ -149,7 +149,7 @@ export default function CardsPage() {
             <a
               key={card.title}
               href="#"
-              className="group glass-card overflow-hidden rounded-[1.25rem]"
+              className="group glass-card rounded-[1.25rem]"
               style={{
                 display: "block",
                 textDecoration: "none",
@@ -157,7 +157,7 @@ export default function CardsPage() {
                 width: 280,
               }}
             >
-              <div className="overflow-hidden" style={{ aspectRatio: "16/10", position: "relative" }}>
+              <div className="overflow-hidden rounded-t-[1.25rem]" style={{ aspectRatio: "16/10", position: "relative" }}>
                 <img
                   src={card.src}
                   alt={card.alt}

@@ -7,8 +7,17 @@ interface BandThemeProps {
   tokens: TokenSet;
 }
 
+function injectFont(href: string) {
+  if (!href || document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = href;
+  document.head.appendChild(link);
+}
+
 export default function BandTheme({ tokens }: BandThemeProps) {
   useEffect(() => {
+    // CSS tokens
     const root = document.documentElement;
     root.style.setProperty("--bg",            tokens.bg);
     root.style.setProperty("--bg2",           tokens.bg2);
@@ -24,21 +33,14 @@ export default function BandTheme({ tokens }: BandThemeProps) {
     root.style.setProperty("--display-font",  `'${tokens.displayFont}', sans-serif`);
     root.style.setProperty("--body-font",     `'${tokens.bodyFont}', system-ui, sans-serif`);
     root.style.setProperty("background-color", tokens.bg);
+
+    // Google Fonts — imperative DOM injection, bypasses PostCSS entirely
+    injectFont(tokens.displayFontUrl);
+    if (tokens.bodyFontUrl !== tokens.displayFontUrl) {
+      injectFont(tokens.bodyFontUrl);
+    }
   }, [tokens]);
 
-  // Inject the correct Google Fonts for this genre's font pair
-  return (
-    <>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      {tokens.displayFontUrl !== tokens.bodyFontUrl ? (
-        <>
-          <link href={tokens.displayFontUrl} rel="stylesheet" />
-          <link href={tokens.bodyFontUrl} rel="stylesheet" />
-        </>
-      ) : (
-        <link href={tokens.displayFontUrl} rel="stylesheet" />
-      )}
-    </>
-  );
+  // No JSX rendered — pure side-effect component
+  return null;
 }

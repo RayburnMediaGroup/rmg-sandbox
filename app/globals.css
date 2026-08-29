@@ -20,8 +20,8 @@ html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
   --muted:         rgba(237,232,223,0.55);
   --muted2:        rgba(237,232,223,0.28);
 
-  --display-font:  'Bebas Neue', sans-serif;
-  --body-font:     'Inter', system-ui, sans-serif;
+  --display-font:  var(--font-bebas), sans-serif;
+  --body-font:     var(--font-inter), system-ui, sans-serif;
 }
 
 body {

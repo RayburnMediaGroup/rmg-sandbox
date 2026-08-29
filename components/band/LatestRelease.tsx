@@ -1,6 +1,8 @@
 "use client";
 
-import { Release } from "@/lib/data";
+import { useState } from "react";
+import { Release, Track } from "@/lib/data";
+import { useAudioPlayer } from "@/lib/audioContext";
 
 interface LatestReleaseProps {
   release: Release;
@@ -81,6 +83,115 @@ const STREAMING_ICONS: Record<string, { label: string; icon: string }> = {
   youtube:    { label: "YouTube",     icon: "▶" },
   soundcloud: { label: "SoundCloud",  icon: "☁" },
 };
+
+// ─── TrackRow ─────────────────────────────────────────────────────
+
+function PlayIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="currentColor">
+      <polygon points="1,0.5 11.5,6 1,11.5" />
+    </svg>
+  );
+}
+function PauseIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="currentColor">
+      <rect x="1" y="0.5" width="3.5" height="11" rx="1" />
+      <rect x="7.5" y="0.5" width="3.5" height="11" rx="1" />
+    </svg>
+  );
+}
+
+function TrackRow({ track, release, index }: { track: Track; release: Release; index: number }) {
+  const [hovered, setHovered] = useState(false);
+  const { playTrack, nowPlaying, isPlaying, togglePlay } = useAudioPlayer();
+
+  const isActive = nowPlaying?.track.number === track.number && nowPlaying?.release.slug === release.slug;
+  const canPlay  = Boolean(track.audioSrc);
+
+  const handleClick = () => {
+    if (!canPlay) return;
+    if (isActive) { togglePlay(); return; }
+    playTrack(track, release, index);
+  };
+
+  return (
+    <li
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={handleClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "0.875rem",
+        padding: "9px 8px",
+        borderRadius: "6px",
+        borderBottom: "1px solid var(--border)",
+        cursor: canPlay ? "pointer" : "default",
+        background: hovered && canPlay ? "var(--accent-dim)" : "transparent",
+        transition: "background 0.15s",
+      }}
+    >
+      {/* Play button / track number */}
+      <div style={{
+        width: "1.5rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        {canPlay && (hovered || isActive) ? (
+          <span style={{ color: isActive ? "var(--accent)" : "var(--muted)" }}>
+            {isActive && isPlaying ? <PauseIcon /> : <PlayIcon />}
+          </span>
+        ) : (
+          <span style={{
+            fontFamily: "monospace",
+            fontSize: "0.6rem",
+            color: isActive ? "var(--accent)" : "var(--muted2)",
+          }}>
+            {String(track.number).padStart(2, "0")}
+          </span>
+        )}
+      </div>
+
+      {/* Title */}
+      <span style={{
+        flex: 1,
+        fontSize: "0.88rem",
+        color: isActive ? "var(--accent-warm)" : hovered ? "var(--text)" : "var(--text)",
+        fontWeight: isActive ? 500 : 300,
+        transition: "color 0.15s",
+      }}>
+        {track.title}
+      </span>
+
+      {/* Duration */}
+      {track.duration && (
+        <span style={{
+          fontFamily: "monospace",
+          fontSize: "0.62rem",
+          color: "var(--muted2)",
+          flexShrink: 0,
+        }}>
+          {track.duration}
+        </span>
+      )}
+    </li>
+  );
+}
+
+function TrackList({ release }: { release: Release }) {
+  return (
+    <ol style={{ listStyle: "none", padding: 0, marginBottom: "2rem" }}>
+      {release.tracks.map((track, i) => (
+        <TrackRow key={track.number} track={track} release={release} index={i} />
+      ))}
+    </ol>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────
 
 export default function LatestRelease({ release }: LatestReleaseProps) {
   const year = new Date(release.releaseDate).getFullYear();
@@ -167,39 +278,7 @@ export default function LatestRelease({ release }: LatestReleaseProps) {
 
             {/* Track list */}
             {release.tracks.length > 0 && (
-              <ol style={{ listStyle: "none", padding: 0, marginBottom: "2rem" }}>
-                {release.tracks.map((track) => (
-                  <li key={track.number} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "1rem",
-                    padding: "8px 0",
-                    borderBottom: "1px solid var(--border)",
-                  }}>
-                    <span style={{
-                      fontFamily: "monospace",
-                      fontSize: "0.65rem",
-                      color: "var(--muted2)",
-                      width: "1.5rem",
-                      textAlign: "right",
-                    }}>
-                      {String(track.number).padStart(2, "0")}
-                    </span>
-                    <span style={{ flex: 1, fontSize: "0.88rem", color: "var(--text)" }}>
-                      {track.title}
-                    </span>
-                    {track.duration && (
-                      <span style={{
-                        fontFamily: "monospace",
-                        fontSize: "0.65rem",
-                        color: "var(--muted2)",
-                      }}>
-                        {track.duration}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ol>
+              <TrackList release={release} />
             )}
 
             {/* Streaming links */}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { artist, releases, shows } from "@/lib/data";
 import { resolveTokens } from "@/lib/genreTokens";
+import { AudioPlayerProvider } from "@/lib/audioContext";
 import Schema from "@/components/band/Schema";
 import BandTheme from "@/components/band/BandTheme";
 import Navbar from "@/components/band/Navbar";
@@ -10,6 +11,7 @@ import Shows from "@/components/band/Shows";
 import PressStrip from "@/components/band/PressStrip";
 import AboutSnippet from "@/components/band/AboutSnippet";
 import StreamingFooter from "@/components/band/StreamingFooter";
+import MiniPlayer from "@/components/band/MiniPlayer";
 
 const CANONICAL_URL = "https://ryanchrys.com";
 
@@ -37,22 +39,25 @@ export default function BandPage() {
   const featuredRelease = releases.find((r) => r.isFeatured) ?? releases[releases.length - 1];
 
   return (
-    <main id="top" style={{ background: tokens.bg }}>
-      <Schema artist={artist} releases={releases} shows={shows} canonicalUrl={CANONICAL_URL} />
-      <BandTheme tokens={tokens} />
-      <Navbar artist={artist} />
-      <Hero artist={artist} featuredRelease={featuredRelease} />
-      <div id="music">
-        <LatestRelease release={featuredRelease} />
-      </div>
-      <Shows shows={shows} />
-      <PressStrip quotes={artist.pressQuotes} />
-      <div id="about">
-        <AboutSnippet artist={artist} />
-      </div>
-      <div id="contact">
-        <StreamingFooter artist={artist} />
-      </div>
-    </main>
+    <AudioPlayerProvider>
+      <main id="top" style={{ background: tokens.bg, paddingBottom: 80 }}>
+        <Schema artist={artist} releases={releases} shows={shows} canonicalUrl={CANONICAL_URL} />
+        <BandTheme tokens={tokens} />
+        <Navbar artist={artist} />
+        <Hero artist={artist} featuredRelease={featuredRelease} />
+        <div id="music">
+          <LatestRelease release={featuredRelease} />
+        </div>
+        <Shows shows={shows} />
+        <PressStrip quotes={artist.pressQuotes} />
+        <div id="about">
+          <AboutSnippet artist={artist} />
+        </div>
+        <div id="contact">
+          <StreamingFooter artist={artist} />
+        </div>
+        <MiniPlayer />
+      </main>
+    </AudioPlayerProvider>
   );
 }

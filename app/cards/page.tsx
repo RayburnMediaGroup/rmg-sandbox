@@ -78,7 +78,7 @@ export default function CardsPage() {
             <a
               key={card.title}
               href="#"
-              className="group glass-card"
+              className="group glass-card overflow-hidden rounded-[1.25rem]"
               style={{ display: "block", textDecoration: "none" }}
             >
               {/* Image wrapper — first child, overflow-hidden — gets top radius from CSS rule */}
@@ -149,7 +149,7 @@ export default function CardsPage() {
             <a
               key={card.title}
               href="#"
-              className="group glass-card"
+              className="group glass-card overflow-hidden rounded-[1.25rem]"
               style={{
                 display: "block",
                 textDecoration: "none",

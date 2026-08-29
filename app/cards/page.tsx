@@ -79,7 +79,7 @@ export default function CardsPage() {
               key={card.title}
               href="#"
               className="group glass-card"
-              style={{ display: "block", textDecoration: "none", overflow: "hidden" }}
+              style={{ display: "block", textDecoration: "none" }}
             >
               {/* Image wrapper — first child, overflow-hidden — gets top radius from CSS rule */}
               <div className="overflow-hidden" style={{ aspectRatio: "16/10", position: "relative" }}>
@@ -153,7 +153,6 @@ export default function CardsPage() {
               style={{
                 display: "block",
                 textDecoration: "none",
-                overflow: "hidden",
                 flexShrink: 0,
                 width: 280,
               }}

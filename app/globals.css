@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+/* ─── BandStack Identity Tokens — Ryan Chrys & The Rough Cuts ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --bg:            #0c0b09;       /* near-black, warm not cool */
+  --bg2:           #141210;       /* surface — cards, sections */
+  --bg3:           #1d1a16;       /* raised surface */
+  --border:        rgba(255,220,150,0.08);
+  --border2:       rgba(255,220,150,0.14);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --accent:        #c8922a;       /* whiskey amber */
+  --accent-warm:   #e0aa48;       /* hover / highlight */
+  --accent-dim:    rgba(200,146,42,0.12);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --text:          #ede8df;       /* warm off-white */
+  --muted:         rgba(237,232,223,0.55);
+  --muted2:        rgba(237,232,223,0.28);
+
+  --display-font:  'Bebas Neue', sans-serif;
+  --body-font:     'Inter', system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body-font);
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ─── Glass Card ─────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.13);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* ─── Card image system ──────────────────────────────────────── */
+.overflow-hidden > img { border-radius: inherit; }
+.glass-card > .overflow-hidden:first-child { border-radius: 1.25rem 1.25rem 0 0; }
+
+/* ─── Horizontal scroll strips ───────────────────────────────── */
+.overflow-x-auto {
+  padding-top: 8px;
+  overflow-y: hidden;
 }

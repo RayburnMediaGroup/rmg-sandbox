@@ -78,8 +78,15 @@ export interface Artist {
   socialLinks: SocialLinks;
   streamingLinks: StreamingLinks;
   bookingEmail?: string;
+  bookingContact?: string;
   newsletterUrl?: string;
   merchUrl?: string;
+  pressPhotos?: { label: string; url?: string }[];
+  oneSheetUrl?: string;
+  stageplotUrl?: string;
+  riderUrl?: string;
+  managementEmail?: string;
+  prEmail?: string;
 }
 
 // ─────────────────────────────────────────────
@@ -143,8 +150,15 @@ export const artist: Artist = {
     youtube: "https://youtube.com/ryanchrys",
   },
   bookingEmail: "spilloutmusic@yahoo.com",
+  bookingContact: "Spill Out Music",
   newsletterUrl: "https://roughcutsband.com/contact/emailsingup/",
   merchUrl: "https://roughcutsband.com/store",
+  pressPhotos: [
+    { label: "Press Photo — Live (Hi-Res)" },
+    { label: "Press Photo — Studio Portrait" },
+    { label: "Band Photo — Full Group" },
+    { label: "Headshot — Ryan Chrys" },
+  ],
 };
 
 // ─────────────────────────────────────────────

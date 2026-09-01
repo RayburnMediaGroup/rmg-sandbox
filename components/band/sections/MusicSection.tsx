@@ -22,6 +22,8 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
 
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState<ProfileRelease>(BLANK);
+  const [addingTrack, setAddingTrack] = useState<string | null>(null); // release title
+  const [trackDraft, setTrackDraft] = useState({ title: "", duration: "" });
 
   useEffect(() => {
     const id = (profile as any).appleMusicArtistId;
@@ -32,25 +34,38 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
       .catch(() => {});
   }, [profile]);
 
-  const releases = liveAlbums
-    ? liveAlbums.map(a => {
-        const apiTitle = (a.title ?? a.name ?? "").toLowerCase().trim();
-        const profileMatch = profile.releases?.find(r => {
-          const pt = r.title.toLowerCase().trim();
-          return pt === apiTitle || pt.includes(apiTitle) || apiTitle.includes(pt);
-        });
-        return {
-          title: a.title ?? a.name ?? "",
-          type: (profileMatch?.type ?? a.type ?? "album") as ProfileRelease["type"],
-          year: a.releaseDate?.slice(0, 4) ?? "",
-          description: profileMatch?.description ?? "",
-          spotifyUrl: a.spotifyUrl ?? profileMatch?.spotifyUrl ?? "",
-          coverArt: a.coverArt ?? profileMatch?.coverArt ?? "",
-          itunesUrl: a.itunesUrl ?? "",
-          tracks: a.tracks.map(t => ({ number: t.number, title: t.title ?? t.name ?? "", duration: t.duration })),
-        };
-      })
-    : (profile.releases ?? []).map(r => ({ ...r, itunesUrl: "" }));
+  const releases = (() => {
+    const profileReleases = profile.releases ?? [];
+    if (!liveAlbums) return profileReleases.map(r => ({ ...r, itunesUrl: "" }));
+
+    // Build merged list: iTunes albums enriched with profile metadata
+    const merged = liveAlbums.map(a => {
+      const apiTitle = (a.title ?? a.name ?? "").toLowerCase().trim();
+      const profileMatch = profileReleases.find(r => {
+        const pt = r.title.toLowerCase().trim();
+        return pt === apiTitle || pt.includes(apiTitle) || apiTitle.includes(pt);
+      });
+      return {
+        title: a.title ?? a.name ?? "",
+        type: (profileMatch?.type ?? a.type ?? "album") as ProfileRelease["type"],
+        year: a.releaseDate?.slice(0, 4) ?? "",
+        description: profileMatch?.description ?? "",
+        spotifyUrl: a.spotifyUrl ?? profileMatch?.spotifyUrl ?? "",
+        coverArt: a.coverArt ?? profileMatch?.coverArt ?? "",
+        itunesUrl: a.itunesUrl ?? "",
+        tracks: a.tracks.map(t => ({ number: t.number, title: t.title ?? t.name ?? "", duration: t.duration })),
+      };
+    });
+
+    // Append any profile releases not matched by iTunes (manually added)
+    const matchedTitles = new Set(merged.map(r => r.title.toLowerCase().trim()));
+    const manualOnly = profileReleases.filter(r => {
+      const pt = r.title.toLowerCase().trim();
+      return !merged.some(m => m.title.toLowerCase().trim() === pt || pt.includes(m.title.toLowerCase().trim()) || m.title.toLowerCase().trim().includes(pt));
+    });
+
+    return [...merged, ...manualOnly.map(r => ({ ...r, itunesUrl: "" }))];
+  })();
 
   const isVerified = !!liveAlbums;
 
@@ -71,6 +86,27 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
     onUpdate?.({ releases: next });
     setDraft(BLANK);
     setAdding(false);
+  }
+
+  function handleAddTrack(releaseTitle: string) {
+    if (!trackDraft.title.trim()) return;
+    const releases = (profile.releases ?? []).map(r => {
+      if (r.title !== releaseTitle) return r;
+      const tracks = r.tracks ?? [];
+      return { ...r, tracks: [...tracks, { number: tracks.length + 1, title: trackDraft.title.trim(), duration: trackDraft.duration.trim() || undefined }] };
+    });
+    onUpdate?.({ releases });
+    setTrackDraft({ title: "", duration: "" });
+    setAddingTrack(null);
+  }
+
+  function handleDeleteTrack(releaseTitle: string, trackNumber: number) {
+    const releases = (profile.releases ?? []).map(r => {
+      if (r.title !== releaseTitle) return r;
+      const tracks = (r.tracks ?? []).filter(t => t.number !== trackNumber).map((t, i) => ({ ...t, number: i + 1 }));
+      return { ...r, tracks };
+    });
+    onUpdate?.({ releases });
   }
 
   function handleDelete(title: string) {
@@ -199,20 +235,41 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
               </div>
             </div>
 
-            {release.tracks && release.tracks.length > 0 && (
-              <div style={{ borderTop: border1 }}>
-                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "24px 1fr 56px" : "32px 1fr 72px", padding: "7px 8px 5px", borderBottom: border1 }}>
-                  <span style={lbl}>#</span><span style={lbl}>Title</span><span style={{ ...lbl, textAlign: "right" }}>Time</span>
+            {(() => {
+              const isManual = (profile.releases ?? []).some(r => r.title === release.title);
+              const canEditTracks = isArtist && isManual;
+              const hasTracks = release.tracks && release.tracks.length > 0;
+              return (hasTracks || canEditTracks) ? (
+                <div style={{ borderTop: border1 }}>
+                  {hasTracks && <>
+                    <div style={{ display: "grid", gridTemplateColumns: canEditTracks ? (isMobile ? "24px 1fr 56px 24px" : "32px 1fr 72px 24px") : (isMobile ? "24px 1fr 56px" : "32px 1fr 72px"), padding: "7px 8px 5px", borderBottom: border1 }}>
+                      <span style={lbl}>#</span><span style={lbl}>Title</span><span style={{ ...lbl, textAlign: "right" }}>Time</span>
+                      {canEditTracks && <span />}
+                    </div>
+                    {release.tracks!.map(t => (
+                      <div key={t.number} style={{ display: "grid", gridTemplateColumns: canEditTracks ? (isMobile ? "24px 1fr 56px 24px" : "32px 1fr 72px 24px") : (isMobile ? "24px 1fr 56px" : "32px 1fr 72px"), padding: "10px 8px", borderBottom: border1, alignItems: "center" }}>
+                        <span style={{ ...lbl, color: tokens.muted2 }}>{t.number}</span>
+                        <span style={{ ...body, fontSize: "0.82rem" }}>{t.title}</span>
+                        <span style={{ ...lbl, textAlign: "right" }}>{(t as any).duration || "—"}</span>
+                        {canEditTracks && <button onClick={() => handleDeleteTrack(release.title, t.number)} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: 0 }}>✕</button>}
+                      </div>
+                    ))}
+                  </>}
+                  {canEditTracks && (
+                    addingTrack === release.title ? (
+                      <div style={{ display: "flex", gap: "0.5rem", padding: "8px", alignItems: "center" }}>
+                        <input value={trackDraft.title} onChange={e => setTrackDraft(d => ({ ...d, title: e.target.value }))} placeholder="Track title" autoFocus onKeyDown={e => { if (e.key === "Enter") handleAddTrack(release.title); if (e.key === "Escape") setAddingTrack(null); }} style={{ ...inp, flex: 1 }} />
+                        <input value={trackDraft.duration} onChange={e => setTrackDraft(d => ({ ...d, duration: e.target.value }))} placeholder="3:42" style={{ ...inp, width: 64 }} />
+                        <button onClick={() => handleAddTrack(release.title)} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 10px", cursor: "pointer" }}>Add</button>
+                        <button onClick={() => setAddingTrack(null)} style={{ ...lbl, background: "transparent", border: `1px solid ${tokens.border}`, borderRadius: 3, padding: "5px 8px", cursor: "pointer", color: tokens.muted }}>✕</button>
+                      </div>
+                    ) : (
+                      <button onClick={() => { setAddingTrack(release.title); setTrackDraft({ title: "", duration: "" }); }} style={{ ...lbl, background: "transparent", border: "none", color: tokens.accent, padding: "8px 8px", cursor: "pointer" }}>+ Add Track</button>
+                    )
+                  )}
                 </div>
-                {release.tracks.map(t => (
-                  <div key={t.number} style={{ display: "grid", gridTemplateColumns: isMobile ? "24px 1fr 56px" : "32px 1fr 72px", padding: "10px 8px", borderBottom: border1, alignItems: "center" }}>
-                    <span style={{ ...lbl, color: tokens.muted2 }}>{t.number}</span>
-                    <span style={{ ...body, fontSize: "0.82rem" }}>{t.title}</span>
-                    <span style={{ ...lbl, textAlign: "right" }}>{(t as any).duration || "—"}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+              ) : null;
+            })()}
           </div>
         )}
 

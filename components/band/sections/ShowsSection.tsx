@@ -58,10 +58,22 @@ export default function ShowsSection({ profile, tokens, isArtist, onUpdate }: Pr
   const upcoming = allShows.filter(s => s.status !== "past");
   const past = allShows.filter(s => s.status === "past");
 
+  function syncHistory(shows: ProfileShow[]) {
+    const pastShows = shows.filter(s => s.status === "past");
+    const existing: any[] = (profile as any).showHistory ?? [];
+    const newEntries = pastShows.filter(s =>
+      !existing.some((h: any) => h.date === s.date && h.venue === s.venue)
+    ).map(s => ({ date: s.date, venue: s.venue, city: s.city, state: s.state, notes: s.notes }));
+    if (newEntries.length > 0) {
+      onUpdate?.({ showHistory: [...existing, ...newEntries] } as any);
+    }
+  }
+
   function updateShow(i: number, field: keyof ProfileShow, val: string) {
     const next = [...allShows];
     next[i] = { ...next[i], [field]: val };
     onUpdate?.({ shows: next });
+    syncHistory(next);
   }
 
   function deleteShow(i: number) {
@@ -70,7 +82,9 @@ export default function ShowsSection({ profile, tokens, isArtist, onUpdate }: Pr
 
   function saveNewShow() {
     if (!draft.venue.trim() || !draft.city.trim()) return;
-    onUpdate?.({ shows: [...allShows, draft] });
+    const next = [...allShows, draft];
+    onUpdate?.({ shows: next });
+    syncHistory(next);
     setDraft(BLANK_SHOW); setAddingShow(false);
   }
 

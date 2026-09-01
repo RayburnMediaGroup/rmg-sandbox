@@ -10,6 +10,7 @@ import { Artist, Release, Show } from "@/lib/data";
 export const artist: Artist = {
   name: "The Milo Vega Quartet",
   slug: "milo-vega-quartet",
+  homeRoute: "/jazz",
   tagline: "Post-bop jazz from the south side of Chicago. Unresolved and unapologetic.",
   bio: [
     "The Milo Vega Quartet has spent fifteen years building a reputation as one of Chicago's most adventurous working bands — a group that holds deep reverence for the hard bop tradition while refusing to be contained by it. Pianist and bandleader Milo Vega leads a working ensemble that has logged more nights at the Green Mill and Andy's Jazz Club than most bands log in a lifetime.",

@@ -19,7 +19,7 @@ function formatDate(iso: string) {
 
 const STATUS_STYLES: Record<Show["status"], { label: string; color: string; bg: string; border: string }> = {
   upcoming:   { label: "Tickets",    color: "#0c0b09",          bg: "var(--accent)",    border: "transparent" },
-  "sold-out": { label: "Sold Out",   color: "var(--accent)",    bg: "transparent",      border: "rgba(200,146,42,0.3)" },
+  "sold-out": { label: "Sold Out",   color: "var(--accent)",    bg: "transparent",      border: "rgba(255,255,255,0.1)" },
   past:       { label: "Past Show",  color: "var(--muted2)",    bg: "transparent",      border: "rgba(237,232,223,0.1)" },
   cancelled:  { label: "Cancelled",  color: "rgba(248,113,113,0.8)", bg: "transparent", border: "rgba(248,113,113,0.2)" },
 };
@@ -66,7 +66,7 @@ export default function Shows({ shows, limit = 4 }: ShowsProps) {
             </h2>
           </div>
           <a
-            href="#"
+            href="/shows"
             style={{
               fontFamily: "monospace",
               fontSize: "0.6rem",
@@ -74,7 +74,7 @@ export default function Shows({ shows, limit = 4 }: ShowsProps) {
               textTransform: "uppercase",
               color: "var(--accent)",
               textDecoration: "none",
-              borderBottom: "1px solid rgba(200,146,42,0.3)",
+              borderBottom: "1px solid rgba(255,255,255,0.1)",
               paddingBottom: "2px",
             }}
           >
@@ -220,14 +220,14 @@ export default function Shows({ shows, limit = 4 }: ShowsProps) {
             <p style={{
               fontFamily: "var(--display-font)",
               fontSize: "1.5rem",
-              color: "var(--muted2)",
+              color: "var(--muted)",
               marginBottom: "0.5rem",
             }}>
               No Upcoming Shows
             </p>
             <p style={{
               fontSize: "0.82rem",
-              color: "var(--muted2)",
+              color: "var(--muted)",
               fontWeight: 300,
             }}>
               Check back soon — or subscribe for updates.

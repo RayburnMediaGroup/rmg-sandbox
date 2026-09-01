@@ -83,9 +83,9 @@ export default function StreamingFooter({ artist }: StreamingFooterProps) {
                 }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.borderColor = "rgba(200,146,42,0.5)";
+                  el.style.borderColor = "rgba(255,255,255,0.18)";
                   el.style.color = "var(--accent-warm)";
-                  el.style.background = "rgba(200,146,42,0.06)";
+                  el.style.background = "rgba(255,255,255,0.04)";
                 }}
                 onMouseLeave={(e) => {
                   const el = e.currentTarget as HTMLAnchorElement;

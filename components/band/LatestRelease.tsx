@@ -23,11 +23,8 @@ function CoverArt({ src, title }: { src?: string; title: string }) {
     <div style={{
       width: "100%", aspectRatio: "1/1",
       borderRadius: "0.75rem",
-      background: `
-        radial-gradient(ellipse 70% 70% at 30% 30%, rgba(140,80,20,0.4) 0%, transparent 60%),
-        linear-gradient(145deg, #1e1508 0%, #0e0c09 100%)
-      `,
-      border: "1px solid rgba(200,146,42,0.15)",
+      background: "linear-gradient(145deg, #161616 0%, #0d0d0d 100%)",
+      border: "1px solid rgba(255,255,255,0.07)",
       display: "flex",
       flexDirection: "column" as const,
       alignItems: "center",
@@ -41,13 +38,13 @@ function CoverArt({ src, title }: { src?: string; title: string }) {
         position: "absolute",
         width: "75%", height: "75%",
         borderRadius: "50%",
-        border: "1px solid rgba(200,146,42,0.08)",
+        border: "1px solid rgba(255,255,255,0.05)",
       }} />
       <div style={{
         position: "absolute",
         width: "30%", height: "30%",
         borderRadius: "50%",
-        border: "1px solid rgba(200,146,42,0.12)",
+        border: "1px solid rgba(255,255,255,0.07)",
       }} />
       <p style={{
         fontFamily: "var(--display-font)",
@@ -65,7 +62,7 @@ function CoverArt({ src, title }: { src?: string; title: string }) {
         fontSize: "0.52rem",
         letterSpacing: "0.18em",
         textTransform: "uppercase",
-        color: "rgba(200,146,42,0.35)",
+        color: "rgba(255,255,255,0.2)",
         marginTop: "1rem",
         position: "relative",
         zIndex: 1,
@@ -223,12 +220,64 @@ export default function LatestRelease({ release }: LatestReleaseProps) {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(min(340px, 100%), 1fr))",
           gap: "4rem",
-          alignItems: "center",
+          alignItems: "start",
         }}>
 
-          {/* Left — cover art */}
+          {/* Left — cover art + streaming */}
           <div>
             <CoverArt src={release.coverArt} title={release.title} />
+            {streamingEntries.length > 0 && (
+              <div style={{ marginTop: "1.25rem" }}>
+                <p style={{
+                  fontFamily: "monospace",
+                  fontSize: "0.55rem",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "var(--muted2)",
+                  marginBottom: "0.75rem",
+                }}>
+                  Listen on
+                </p>
+                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" as const }}>
+                  {streamingEntries.map(([platform, url]) => {
+                    const meta = STREAMING_ICONS[platform] ?? { label: platform, icon: "→" };
+                    return (
+                      <a
+                        key={platform}
+                        href={url!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontFamily: "var(--body-font)",
+                          fontSize: "0.75rem",
+                          fontWeight: 400,
+                          color: "var(--text)",
+                          textDecoration: "none",
+                          padding: "8px 16px",
+                          borderRadius: "9999px",
+                          border: "1px solid var(--border2)",
+                          background: "var(--bg3)",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(255,255,255,0.2)";
+                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent-warm)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border2)";
+                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--text)";
+                        }}
+                      >
+                        <span style={{ fontSize: "0.8rem" }}>{meta.icon}</span>
+                        {meta.label}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right — info */}
@@ -242,7 +291,7 @@ export default function LatestRelease({ release }: LatestReleaseProps) {
               textTransform: "uppercase",
               color: "var(--accent)",
               background: "var(--accent-dim)",
-              border: "1px solid rgba(200,146,42,0.25)",
+              border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "9999px",
               padding: "3px 10px",
               marginBottom: "1rem",
@@ -281,60 +330,6 @@ export default function LatestRelease({ release }: LatestReleaseProps) {
               <TrackList release={release} />
             )}
 
-            {/* Streaming links */}
-            {streamingEntries.length > 0 && (
-              <div>
-                <p style={{
-                  fontFamily: "monospace",
-                  fontSize: "0.55rem",
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "var(--muted2)",
-                  marginBottom: "0.75rem",
-                }}>
-                  Listen on
-                </p>
-                <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
-                  {streamingEntries.map(([platform, url]) => {
-                    const meta = STREAMING_ICONS[platform] ?? { label: platform, icon: "→" };
-                    return (
-                      <a
-                        key={platform}
-                        href={url!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          fontFamily: "var(--body-font)",
-                          fontSize: "0.75rem",
-                          fontWeight: 400,
-                          color: "var(--text)",
-                          textDecoration: "none",
-                          padding: "8px 16px",
-                          borderRadius: "9999px",
-                          border: "1px solid var(--border2)",
-                          background: "var(--bg3)",
-                          transition: "border-color 0.2s, color 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(200,146,42,0.5)";
-                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent-warm)";
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border2)";
-                          (e.currentTarget as HTMLAnchorElement).style.color = "var(--text)";
-                        }}
-                      >
-                        <span style={{ fontSize: "0.8rem" }}>{meta.icon}</span>
-                        {meta.label}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

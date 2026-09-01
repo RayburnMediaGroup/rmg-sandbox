@@ -44,8 +44,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(255,220,150,0.08)",
     border2:        "rgba(255,220,150,0.18)",
     text:           "#ede8df",
-    muted:          "rgba(237,232,223,0.55)",
-    muted2:         "rgba(237,232,223,0.28)",
+    muted:          "rgba(237,232,223,0.70)",
+    muted2:         "rgba(237,232,223,0.45)",
   },
 
   // Country / Country Rock — bright sunlit gold, separate from outlaw's burnt amber
@@ -63,8 +63,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(240,220,100,0.08)",
     border2:        "rgba(240,220,100,0.18)",
     text:           "#f0ecd8",
-    muted:          "rgba(240,236,216,0.55)",
-    muted2:         "rgba(240,236,216,0.28)",
+    muted:          "rgba(240,236,216,0.70)",
+    muted2:         "rgba(240,236,216,0.45)",
   },
 
   // Indie — cool mint green, contemporary, airy
@@ -82,8 +82,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(100,200,195,0.08)",
     border2:        "rgba(100,200,195,0.16)",
     text:           "#d8eeec",
-    muted:          "rgba(216,238,236,0.55)",
-    muted2:         "rgba(216,238,236,0.28)",
+    muted:          "rgba(216,238,236,0.70)",
+    muted2:         "rgba(216,238,236,0.45)",
   },
 
   // Folk — muted sage olive, organic, earthy (not warm brown)
@@ -101,8 +101,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(160,210,120,0.08)",
     border2:        "rgba(160,210,120,0.16)",
     text:           "#ddecd8",
-    muted:          "rgba(221,236,216,0.55)",
-    muted2:         "rgba(221,236,216,0.28)",
+    muted:          "rgba(221,236,216,0.70)",
+    muted2:         "rgba(221,236,216,0.45)",
   },
 
   // Rock / Alternative
@@ -120,8 +120,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(255,255,255,0.07)",
     border2:        "rgba(255,255,255,0.14)",
     text:           "#e8e8e8",
-    muted:          "rgba(232,232,232,0.55)",
-    muted2:         "rgba(232,232,232,0.28)",
+    muted:          "rgba(232,232,232,0.70)",
+    muted2:         "rgba(232,232,232,0.45)",
   },
 
   "alternative": {
@@ -138,8 +138,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(200,180,255,0.08)",
     border2:        "rgba(200,180,255,0.16)",
     text:           "#e4e2f0",
-    muted:          "rgba(228,226,240,0.55)",
-    muted2:         "rgba(228,226,240,0.28)",
+    muted:          "rgba(228,226,240,0.70)",
+    muted2:         "rgba(228,226,240,0.45)",
   },
 
   // Punk / Hardcore
@@ -157,8 +157,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(255,255,255,0.07)",
     border2:        "rgba(255,255,255,0.14)",
     text:           "#f0f0f0",
-    muted:          "rgba(240,240,240,0.55)",
-    muted2:         "rgba(240,240,240,0.28)",
+    muted:          "rgba(240,240,240,0.70)",
+    muted2:         "rgba(240,240,240,0.45)",
   },
 
   // Electronic / Ambient / Synth
@@ -176,8 +176,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(0,200,200,0.1)",
     border2:        "rgba(0,200,200,0.2)",
     text:           "#d8eef0",
-    muted:          "rgba(216,238,240,0.55)",
-    muted2:         "rgba(216,238,240,0.28)",
+    muted:          "rgba(216,238,240,0.70)",
+    muted2:         "rgba(216,238,240,0.45)",
   },
 
   "ambient": {
@@ -194,8 +194,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(100,150,200,0.1)",
     border2:        "rgba(100,150,200,0.2)",
     text:           "#d5dde8",
-    muted:          "rgba(213,221,232,0.55)",
-    muted2:         "rgba(213,221,232,0.28)",
+    muted:          "rgba(213,221,232,0.70)",
+    muted2:         "rgba(213,221,232,0.45)",
   },
 
   // Metal
@@ -204,17 +204,17 @@ const TOKENS: Record<string, TokenSet> = {
     bodyFont:       "Inter",
     displayFontUrl: "https://fonts.googleapis.com/css2?family=Anton&display=swap",
     bodyFontUrl:    "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap",
-    accent:         "#aaaaaa",
-    accentWarm:     "#cccccc",
-    accentDim:      "rgba(170,170,170,0.10)",
-    bg:             "#070707",
-    bg2:            "#0d0d0d",
-    bg3:            "#141414",
-    border:         "rgba(255,255,255,0.07)",
-    border2:        "rgba(255,255,255,0.14)",
+    accent:         "#c41a1a",
+    accentWarm:     "#e02020",
+    accentDim:      "rgba(196,26,26,0.12)",
+    bg:             "#060606",
+    bg2:            "#0c0c0c",
+    bg3:            "#131313",
+    border:         "rgba(196,26,26,0.15)",
+    border2:        "rgba(196,26,26,0.25)",
     text:           "#e8e8e8",
-    muted:          "rgba(232,232,232,0.50)",
-    muted2:         "rgba(232,232,232,0.25)",
+    muted:          "rgba(232,232,232,0.68)",
+    muted2:         "rgba(232,232,232,0.42)",
   },
 
   // Jazz / Soul / R&B
@@ -233,8 +233,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(200,100,140,0.08)",
     border2:        "rgba(200,100,140,0.18)",
     text:           "#edd8e4",
-    muted:          "rgba(237,216,228,0.55)",
-    muted2:         "rgba(237,216,228,0.28)",
+    muted:          "rgba(237,216,228,0.70)",
+    muted2:         "rgba(237,216,228,0.45)",
   },
 
   // Soul — deep orange-copper, warm and visceral
@@ -252,8 +252,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(220,130,80,0.08)",
     border2:        "rgba(220,130,80,0.18)",
     text:           "#f0e0d0",
-    muted:          "rgba(240,224,208,0.55)",
-    muted2:         "rgba(240,224,208,0.28)",
+    muted:          "rgba(240,224,208,0.70)",
+    muted2:         "rgba(240,224,208,0.45)",
   },
 
   // Hip-Hop / Rap
@@ -271,8 +271,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(245,200,66,0.08)",
     border2:        "rgba(245,200,66,0.18)",
     text:           "#f0f0f0",
-    muted:          "rgba(240,240,240,0.55)",
-    muted2:         "rgba(240,240,240,0.28)",
+    muted:          "rgba(240,240,240,0.70)",
+    muted2:         "rgba(240,240,240,0.45)",
   },
 
   // Blues
@@ -290,8 +290,8 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(100,150,200,0.08)",
     border2:        "rgba(100,150,200,0.16)",
     text:           "#d8dde8",
-    muted:          "rgba(216,221,232,0.55)",
-    muted2:         "rgba(216,221,232,0.28)",
+    muted:          "rgba(216,221,232,0.70)",
+    muted2:         "rgba(216,221,232,0.45)",
   },
 
   // Americana — dusty brick red / terracotta, southwestern
@@ -309,14 +309,30 @@ const TOKENS: Record<string, TokenSet> = {
     border:         "rgba(210,100,70,0.08)",
     border2:        "rgba(210,100,70,0.18)",
     text:           "#f0ddd8",
-    muted:          "rgba(240,221,216,0.55)",
-    muted2:         "rgba(240,221,216,0.28)",
+    muted:          "rgba(240,221,216,0.70)",
+    muted2:         "rgba(240,221,216,0.45)",
   },
 };
 
 // ─── Default fallback ─────────────────────────────────────────────
 
-const DEFAULT_TOKENS: TokenSet = TOKENS["rock"];
+const DEFAULT_TOKENS: TokenSet = {
+  displayFont:    "Inter",
+  bodyFont:       "Inter",
+  displayFontUrl: "",
+  bodyFontUrl:    "",
+  accent:         "#888888",
+  accentWarm:     "#aaaaaa",
+  accentDim:      "rgba(136,136,136,0.10)",
+  bg:             "#0a0a0a",
+  bg2:            "#111111",
+  bg3:            "#181818",
+  border:         "rgba(255,255,255,0.07)",
+  border2:        "rgba(255,255,255,0.13)",
+  text:           "#e8e8e8",
+  muted:          "rgba(232,232,232,0.68)",
+  muted2:         "rgba(232,232,232,0.42)",
+};
 
 // ─── Resolver ────────────────────────────────────────────────────
 // Takes artist.genre[] and returns the first matching TokenSet.
@@ -326,11 +342,25 @@ export function resolveTokens(genres: string[]): TokenSet {
   for (const g of genres) {
     const key = g.toLowerCase().trim();
     if (TOKENS[key]) return TOKENS[key];
-    // partial match — "outlaw country" matches "outlaw country"
     const partial = Object.keys(TOKENS).find((k) => key.includes(k) || k.includes(key));
     if (partial) return TOKENS[partial];
   }
   return DEFAULT_TOKENS;
+}
+
+export function applyMode(tokens: TokenSet, mode: "dark" | "light"): TokenSet {
+  if (mode === "dark") return tokens;
+  return {
+    ...tokens,
+    bg:      "#f5f5f5",
+    bg2:     "#eeeeee",
+    bg3:     "#e6e6e6",
+    border:  "rgba(0,0,0,0.08)",
+    border2: "rgba(0,0,0,0.15)",
+    text:    "#111111",
+    muted:   "rgba(0,0,0,0.5)",
+    muted2:  "rgba(0,0,0,0.3)",
+  };
 }
 
 export { TOKENS };

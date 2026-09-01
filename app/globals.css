@@ -21,6 +21,7 @@ html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
   --muted2:        rgba(237,232,223,0.28);
 
   --display-font:  var(--font-bebas), sans-serif;
+  --editorial-font: var(--font-playfair), Georgia, serif;
   --body-font:     var(--font-inter), system-ui, sans-serif;
 }
 
@@ -30,6 +31,50 @@ body {
   font-family: var(--body-font);
   font-weight: 300;
   margin: 0;
+}
+
+/* ─── Editorial section labels ───────────────────────────────── */
+.section-label {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--accent);
+}
+.section-label::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.section-label.accent-after::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ─── Editorial headings ─────────────────────────────────────── */
+.editorial-h1 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.0;
+}
+.editorial-h2 {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
 }
 
 /* ─── Glass Card ─────────────────────────────────────────────── */

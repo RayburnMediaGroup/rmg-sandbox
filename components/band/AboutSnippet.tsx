@@ -50,7 +50,7 @@ export default function AboutSnippet({ artist }: AboutSnippetProps) {
             fontSize: "0.52rem",
             letterSpacing: "0.18em",
             textTransform: "uppercase",
-            color: "rgba(200,146,42,0.3)",
+            color: "rgba(255,255,255,0.1)",
           }}>
             ⚠ Band photo placeholder
           </p>
@@ -130,7 +130,7 @@ export default function AboutSnippet({ artist }: AboutSnippetProps) {
               textTransform: "uppercase",
               color: "var(--accent)",
               textDecoration: "none",
-              borderBottom: "1px solid rgba(200,146,42,0.3)",
+              borderBottom: "1px solid rgba(255,255,255,0.1)",
               paddingBottom: "2px",
             }}
           >

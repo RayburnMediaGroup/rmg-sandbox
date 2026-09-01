@@ -57,7 +57,7 @@ function HeroBackground({ src }: { src?: string }) {
       <div style={{
         position: "absolute", bottom: 24, left: 24,
         fontFamily: "monospace", fontSize: "0.55rem", letterSpacing: "0.18em",
-        textTransform: "uppercase", color: "rgba(200,146,42,0.4)",
+        textTransform: "uppercase", color: "rgba(255,255,255,0.25)",
       }}>
         ⚠ Hero photo placeholder — replace with band image
       </div>

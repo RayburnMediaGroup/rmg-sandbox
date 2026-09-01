@@ -7,16 +7,17 @@ interface NavbarProps {
   artist: Artist;
 }
 
-const NAV_LINKS = [
-  { label: "Music",   href: "#music"   },
-  { label: "Shows",   href: "#shows"   },
-  { label: "About",   href: "#about"   },
-  { label: "Contact", href: "#contact" },
-];
-
 export default function Navbar({ artist }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
+  const navLinks = [
+    { label: "Music",      href: `${artist.homeRoute}#music` },
+    { label: "Shows",      href: "/shows"                    },
+    { label: "Videos",     href: "/videos"                   },
+    { label: "EPK",        href: "/epk"                      },
+    { label: "Stage Plot", href: "/stage-plot"               },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -74,7 +75,7 @@ export default function Navbar({ artist }: NavbarProps) {
           alignItems: "center",
           gap: "2rem",
         }}>
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}

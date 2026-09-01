@@ -7,9 +7,10 @@ interface Props {
   onUnlock: () => void;
   onClose: () => void;
   accentColor: string;
+  profileKey: string;
 }
 
-export default function PinUnlock({ onUnlock, onClose, accentColor }: Props) {
+export default function PinUnlock({ onUnlock, onClose, accentColor, profileKey }: Props) {
   // "enter" → type PIN, "change" → set new PIN after default, "confirm" → confirm new PIN
   const [mode, setMode] = useState<"enter" | "change" | "confirm">("enter");
   const [pin, setPin_] = useState("");
@@ -30,9 +31,9 @@ export default function PinUnlock({ onUnlock, onClose, accentColor }: Props) {
     setError("");
 
     if (mode === "enter") {
-      const ok = await verifyPin(pin);
+      const ok = await verifyPin(pin, profileKey);
       if (!ok) { setError("Incorrect PIN"); setPin_(""); triggerShake(); return; }
-      unlockSession();
+      unlockSession(profileKey);
       onUnlock();
     } else if (mode === "change") {
       if (newPin.length < 4) { setError("PIN must be at least 4 digits"); return; }
@@ -40,7 +41,7 @@ export default function PinUnlock({ onUnlock, onClose, accentColor }: Props) {
     } else {
       // confirm
       if (newPin !== confirm) { setError("PINs don't match"); setConfirm(""); triggerShake(); return; }
-      await setPin(newPin);
+      await setPin(newPin, profileKey);
       onUnlock();
     }
   }

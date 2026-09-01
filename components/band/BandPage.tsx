@@ -86,7 +86,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
 
   useEffect(() => {
     setProfile(loadProfile());
-    setArtistUnlocked(isUnlocked());
+    setArtistUnlocked(isUnlocked(profileKey));
     try { const em = sessionStorage.getItem(EDIT_KEY); if (em === "1") setEditMode(true); } catch {}
     try {
       const params = new URLSearchParams(window.location.search);
@@ -146,24 +146,32 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
             <img src={profile.coverImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%", display: "block" }} />
           )}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.88) 100%)" }} />
+          {editMode && (
+            <button onClick={() => { const url = prompt("Cover image URL:"); if (url?.trim()) onUpdate({ coverImage: url.trim() }); }} style={{ position: "absolute", top: 10, right: 10, background: tokens.accent, border: "none", borderRadius: 4, color: "#000", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>✎ Cover</button>
+          )}
         </div>
 
         <div style={{ padding: isMobile ? "0 16px 24px" : "0 40px 32px", marginTop: isMobile ? -60 : -80, position: "relative" }}>
           <div style={{ maxWidth: 860, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "flex-end", gap: isMobile ? "0.75rem" : "1.75rem" }}>
 
             {/* Avatar */}
-            <div style={{
-              width: isMobile ? 90 : 140, height: isMobile ? 90 : 140,
-              borderRadius: 8, flexShrink: 0,
-              background: isLt ? "#d8d8d8" : "#1a1a1a",
-              border: `3px solid ${tokens.bg}`, overflow: "hidden",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.6)",
-            }}>
-              {profile.heroImage
-                ? <img src={profile.heroImage} alt={profile.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="0.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-              }
+            <div style={{ position: "relative", flexShrink: 0 }}>
+              <div style={{
+                width: isMobile ? 90 : 140, height: isMobile ? 90 : 140,
+                borderRadius: 8,
+                background: isLt ? "#d8d8d8" : "#1a1a1a",
+                border: `3px solid ${tokens.bg}`, overflow: "hidden",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.6)",
+              }}>
+                {profile.heroImage
+                  ? <img src={profile.heroImage} alt={profile.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  : <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="0.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                }
+              </div>
+              {editMode && (
+                <button onClick={() => { const url = prompt("Profile photo URL:"); if (url?.trim()) onUpdate({ heroImage: url.trim() }); }} style={{ position: "absolute", bottom: 4, right: 4, background: tokens.accent, border: "none", borderRadius: 4, color: "#000", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>✎ Photo</button>
+              )}
             </div>
 
             {/* Identity */}
@@ -288,7 +296,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
 
       {/* ── Sections ── */}
       {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
-      {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={editMode} />}
+      {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
       {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={editMode} />}
       {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
       {active === "history"    && <HistorySection    profile={profile} tokens={tokens} />}
@@ -312,6 +320,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
       {showPinModal && (
         <PinUnlock
           accentColor={tokens.accent}
+          profileKey={profileKey}
           onUnlock={() => { setArtistUnlocked(true); setShowPinModal(false); setShowDashboard(true); }}
           onClose={() => setShowPinModal(false)}
         />
@@ -323,6 +332,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
           accentColor={tokens.accent}
           bandName={profile.name}
           editMode={editMode}
+          profileKey={profileKey}
           onToggleEditMode={() => { setEditMode(e => { const next = !e; try { if (next) sessionStorage.setItem(EDIT_KEY, "1"); else sessionStorage.removeItem(EDIT_KEY); } catch {} return next; }); setShowDashboard(false); }}
           onClose={() => setShowDashboard(false)}
           onLock={() => { setArtistUnlocked(false); setEditMode(false); try { sessionStorage.removeItem(EDIT_KEY); } catch {} }}

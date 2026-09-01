@@ -10,6 +10,7 @@ interface Props {
   accentColor: string;
   bandName: string;
   editMode: boolean;
+  profileKey: string;
 }
 
 const PLATFORM_LINKS = [
@@ -42,7 +43,7 @@ const PLATFORM_LINKS = [
 
 const categories = [...new Set(PLATFORM_LINKS.map(l => l.category))];
 
-export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode }: Props) {
+export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey }: Props) {
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
   const lbl: React.CSSProperties = { ...T, fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "#555", fontWeight: 500 };
 
@@ -66,7 +67,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
   }
 
   function handleLock() {
-    lockSession();
+    lockSession(profileKey);
     onLock();
     onClose();
   }

@@ -28,6 +28,9 @@ const DEFAULT_PROFILE: ProfileData = {
   colorMode: "dark",
   appleMusicArtistId: "1633828507",
   youtubeChannelId: "UC5jgVhjLdj2Kd-Ty6BLkFLw",
+  videos: [
+    { title: "Delimitwhore (Official Music Video)", youtubeId: "5YVg8vX8Ew0", date: "2024" },
+  ],
   links: [
     { category: "Streaming", label: "Spotify",          url: "https://open.spotify.com/artist/3hrYxjghoWnBcGXEOMxFYu" },
     { category: "Streaming", label: "Apple Music",      url: "https://music.apple.com/us/artist/as-we-rise/1633828507" },

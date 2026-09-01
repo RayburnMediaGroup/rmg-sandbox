@@ -27,6 +27,7 @@ const DEFAULT_PROFILE: ProfileData = {
   albumArt: "",
   colorMode: "dark",
   appleMusicArtistId: "1633828507",
+  youtubeChannelId: "UC5jgVhjLdj2Kd-Ty6BLkFLw",
   links: [
     { category: "Streaming", label: "Spotify",          url: "https://open.spotify.com/artist/3hrYxjghoWnBcGXEOMxFYu" },
     { category: "Streaming", label: "Apple Music",      url: "https://music.apple.com/us/artist/as-we-rise/1633828507" },

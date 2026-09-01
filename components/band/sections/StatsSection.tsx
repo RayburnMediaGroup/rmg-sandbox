@@ -55,7 +55,7 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
 
     Promise.allSettled([
       fetch(`/api/lastfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
-      fetch(`/api/youtube`).then(r => r.json()),
+      fetch(`/api/youtube${profile.youtubeChannelId ? `?channelId=${profile.youtubeChannelId}` : ""}`).then(r => r.json()),
       fetch(`/api/setlistfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
     ]).then(([lfm, yt, sl]) => {
       if (lfm.status === "fulfilled" && !lfm.value.error) setLastfm(lfm.value);

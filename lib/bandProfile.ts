@@ -87,6 +87,7 @@ export interface ProfileData {
   syncProfile?: SyncProfile;
   mailingListCount?: number;
   appleMusicArtistId?: string | number;
+  youtubeChannelId?: string;
   showHistory?: any[];
   milestones?: any[];
   influences?: string[];

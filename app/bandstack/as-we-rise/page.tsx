@@ -30,6 +30,7 @@ const DEFAULT_PROFILE: ProfileData = {
   youtubeChannelId: "UC5jgVhjLdj2Kd-Ty6BLkFLw",
   videos: [
     { title: "Delimitwhore (Official Music Video)", youtubeId: "5YVg8vX8Ew0", date: "2024" },
+    { title: "Head Underwater (Official Music Video)", youtubeId: "_b2tKW2x_JU", date: "2023" },
   ],
   links: [
     { category: "Streaming", label: "Spotify",          url: "https://open.spotify.com/artist/3hrYxjghoWnBcGXEOMxFYu" },

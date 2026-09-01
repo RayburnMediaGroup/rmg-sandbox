@@ -297,7 +297,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
       {/* ── Sections ── */}
       {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
       {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={editMode} />}
+      {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
       {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
       {active === "history"    && <HistorySection    profile={profile} tokens={tokens} />}
       {active === "videos"     && <VideosSection     profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}

@@ -40,6 +40,9 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
   const syncProfile = profile.syncProfile;
   const tracks = syncProfile?.tracks ?? [];
 
+  const BLANK_TRACK: SyncTrack = { title: "", albumTitle: "", licensingStatus: "available", mood: [], theme: [], instrumentation: [], explicit: false, hasInstrumental: false, hasStems: false };
+  const [addingTrack, setAddingTrack] = useState(false);
+
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
   const [themeFilter, setThemeFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<SyncLicensingStatus | "all">("all");
@@ -75,7 +78,8 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
     window.location.href = `mailto:${syncProfile?.contactEmail ?? profile.bookingEmail}?subject=${subj}&body=${body2}`;
   }
 
-  const TrackEditor = ({ t }: { t: SyncTrack }) => {
+  const TrackEditor = ({ t, onDone }: { t: SyncTrack; onDone?: () => void }) => {
+    const isNew = !t.title;
     const [form, setForm] = useState<SyncTrack>({ ...t });
     const [moodInput, setMoodInput] = useState("");
     const [themeInput, setThemeInput] = useState("");
@@ -85,6 +89,12 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
 
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        {isNew && (
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "0.5rem" }}>
+            <input value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} placeholder="Track title *" style={inp} />
+            <input value={form.albumTitle ?? ""} onChange={e => setForm(p => ({ ...p, albumTitle: e.target.value }))} placeholder="Album / EP (optional)" style={inp} />
+          </div>
+        )}
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr 1fr 1fr", gap: "0.5rem" }}>
           {[["isrc","ISRC"],["bpm","BPM"],["musicalKey","Key (e.g. G Major)"],["duration","Duration"]].map(([k, ph]) => (
             <input key={k} value={(form[k as keyof SyncTrack] as string | number) ?? ""} onChange={e => setForm(p => ({ ...p, [k]: e.target.value }))} placeholder={ph} style={inp} />
@@ -148,8 +158,8 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button onClick={() => saveTrack(form)} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "6px 16px", cursor: "pointer" }}>Save</button>
-          <button onClick={() => setEditingTrack(null)} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "6px 16px", cursor: "pointer" }}>Cancel</button>
+          <button onClick={() => { if (!form.title.trim()) return; saveTrack(form); onDone?.(); }} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "6px 16px", cursor: "pointer" }}>Save</button>
+          <button onClick={() => { setEditingTrack(null); onDone?.(); }} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "6px 16px", cursor: "pointer" }}>Cancel</button>
         </div>
       </div>
     );
@@ -165,7 +175,10 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
             <p className="section-label">Sync Licensing</p>
             <p style={{ ...body, fontSize: "0.72rem", marginTop: "0.3rem" }}>Music available for film · TV · advertising · games</p>
           </div>
-          {isArtist && <button onClick={() => setEditingProfile(true)} style={{ ...lbl, background: "transparent", border: border2, borderRadius: 3, color: tokens.muted, padding: "4px 10px", cursor: "pointer" }}>Edit Profile</button>}
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            {isArtist && <button onClick={() => setAddingTrack(true)} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "4px 10px", cursor: "pointer" }}>+ Add Track</button>}
+            {isArtist && <button onClick={() => { if (!syncProfile) onUpdate?.({ syncProfile: { tracks: [], pro: "", publisher: "", ipiNumber: "", contactName: "", contactEmail: "", syncReelUrl: "", stemFilesAvailable: false, instrumentalVersionsAvailable: false } }); setEditingProfile(true); }} style={{ ...lbl, background: "transparent", border: border2, borderRadius: 3, color: tokens.muted, padding: "4px 10px", cursor: "pointer" }}>Edit Profile</button>}
+          </div>
         </div>
 
         {/* Sync profile card */}
@@ -326,6 +339,14 @@ export default function SyncSection({ profile, tokens, isArtist, onUpdate }: Pro
             );
           })}
         </div>
+
+        {/* Add track form */}
+        {addingTrack && isArtist && (
+          <div style={{ marginTop: "1rem", background: surface, border: `1px solid ${tokens.accent}44`, borderRadius: 8, padding: "1.25rem" }}>
+            <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.75rem" }}>New Sync Track</p>
+            <TrackEditor t={{ ...BLANK_TRACK }} onDone={() => setAddingTrack(false)} />
+          </div>
+        )}
 
         {/* Footer CTA */}
         <div style={{ marginTop: "2rem", paddingTop: "1.5rem", borderTop: border1, display: "flex", alignItems: "center", justifyContent: "space-between" }}>

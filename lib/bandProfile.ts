@@ -1,7 +1,7 @@
 import { artist, releases as dataReleases, shows as dataShows, gear as dataGear, videos as dataVideos, showHistory as dataShowHistory, type GearItem } from "@/lib/data";
 
 export interface ProfileMember { name: string; role: string; }
-export interface ProfileTrack { number: number; title: string; duration?: string; }
+export interface ProfileTrack { number: number; title: string; duration?: string; lyrics?: string; }
 export interface ProfileRelease {
   title: string; type: "album" | "ep" | "single" | "live";
   year: string; description: string; spotifyUrl: string; coverArt: string;

@@ -82,7 +82,7 @@ export default function BackstageFlashPage() {
 
   useEffect(() => {
     setProfile(loadPhotoProfile());
-    setArtistUnlocked(isUnlocked());
+    setArtistUnlocked(isUnlocked(PROFILE_KEY));
   }, []);
 
   function onUpdate(updates: Partial<typeof PROFILE>) {
@@ -371,6 +371,7 @@ export default function BackstageFlashPage() {
       {showPinModal && (
         <PinUnlock
           accentColor={tokens.accent}
+          profileKey={PROFILE_KEY}
           onUnlock={() => { setArtistUnlocked(true); setShowPinModal(false); setEditMode(true); }}
           onClose={() => setShowPinModal(false)}
         />

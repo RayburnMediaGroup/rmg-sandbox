@@ -56,6 +56,8 @@ const NAV_PRO = [
   { id: "stage-plot",   label: "Stage Plot", href: "/band/stage-plot" },
 ];
 
+const PROFILE_KEY = "bandstack-band-v1";
+
 export default function BandPage() {
   const isMobile = useMobile();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -76,7 +78,7 @@ export default function BandPage() {
 
   useEffect(() => {
     setProfile(loadProfile());
-    setArtistUnlocked(isUnlocked());
+    setArtistUnlocked(isUnlocked(PROFILE_KEY));
     // Capture ?ref= affiliate code on any page load
     try {
       const params = new URLSearchParams(window.location.search);
@@ -285,6 +287,7 @@ export default function BandPage() {
       {showPinModal && (
         <PinUnlock
           accentColor={tokens.accent}
+          profileKey={PROFILE_KEY}
           onUnlock={() => { setArtistUnlocked(true); setShowPinModal(false); setShowDashboard(true); }}
           onClose={() => setShowPinModal(false)}
         />
@@ -294,6 +297,7 @@ export default function BandPage() {
       {showDashboard && artistUnlocked && (
         <ArtistDashboard
           accentColor={tokens.accent}
+          profileKey={PROFILE_KEY}
           bandName={profile.name}
           editMode={editMode}
           onToggleEditMode={() => { setEditMode(e => !e); setShowDashboard(false); }}

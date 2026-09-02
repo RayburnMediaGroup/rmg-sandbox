@@ -225,15 +225,9 @@ export default function IntakeForm() {
     const { error } = await supabase.from("bands").insert({ slug, profile });
 
     if (error) {
-      console.error("Supabase insert error:", error.message, error.code, error.details);
-      // Fallback: localStorage only
-      try {
-        localStorage.setItem(TEMPLATE_KEY, JSON.stringify(profile));
-        localStorage.setItem(`${TEMPLATE_KEY}-dataversion`, DATA_VERSION);
-        sessionStorage.setItem(`bandstack-unlocked-${TEMPLATE_KEY}`, "1");
-        sessionStorage.setItem(`bandstack-editmode-${TEMPLATE_KEY}`, "1");
-      } catch {}
-      router.push("/bandstack/template");
+      // Show error visibly so we can diagnose
+      alert(`Supabase error: ${error.message} (${error.code})`);
+      setSubmitted(false);
     } else {
       router.push(`/bandstack/${slug}`);
     }

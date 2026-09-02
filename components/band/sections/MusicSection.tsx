@@ -211,9 +211,47 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
                 }
               </div>
               <div style={{ flex: 1 }}>
-                <h2 style={{ ...T, fontWeight: 700, fontSize: "1.3rem", color: tokens.text, margin: "0 0 0.25rem" }}>{release.title}</h2>
-                <p style={lbl}>{release.type} · {release.year}</p>
-                {release.description && <p style={{ ...body, color: tokens.muted, fontSize: "0.8rem", marginTop: "0.4rem" }}>{release.description}</p>}
+                {(isArtist && !isVerified) ? (
+                  <>
+                    <input
+                      defaultValue={release.title}
+                      onBlur={e => { const v = e.target.value.trim(); if (v && v !== release.title) onUpdate?.({ releases: (profile.releases ?? []).map(r => r.title === release.title ? { ...r, title: v } : r) }); }}
+                      style={{ ...inp, fontWeight: 700, fontSize: "1.1rem", marginBottom: "0.35rem" }}
+                      placeholder="Release title"
+                    />
+                    <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.35rem" }}>
+                      <select
+                        value={release.type}
+                        onChange={e => onUpdate?.({ releases: (profile.releases ?? []).map(r => r.title === release.title ? { ...r, type: e.target.value as ProfileRelease["type"] } : r) })}
+                        style={{ ...inp, width: "auto", flex: 1 }}
+                      >
+                        <option value="album">Album</option>
+                        <option value="ep">EP</option>
+                        <option value="single">Single</option>
+                        <option value="live">Live</option>
+                      </select>
+                      <input
+                        defaultValue={release.year}
+                        onBlur={e => { const v = e.target.value.trim(); if (v) onUpdate?.({ releases: (profile.releases ?? []).map(r => r.title === release.title ? { ...r, year: v } : r) }); }}
+                        style={{ ...inp, width: 80 }}
+                        placeholder="Year"
+                      />
+                    </div>
+                    <textarea
+                      defaultValue={release.description}
+                      onBlur={e => { const v = e.target.value.trim(); onUpdate?.({ releases: (profile.releases ?? []).map(r => r.title === release.title ? { ...r, description: v } : r) }); }}
+                      rows={3}
+                      style={{ ...inp, resize: "vertical" }}
+                      placeholder="Release description — what inspired it, what it sounds like."
+                    />
+                  </>
+                ) : (
+                  <>
+                    <h2 style={{ ...T, fontWeight: 700, fontSize: "1.3rem", color: tokens.text, margin: "0 0 0.25rem" }}>{release.title}</h2>
+                    <p style={lbl}>{release.type} · {release.year}</p>
+                    {release.description && <p style={{ ...body, color: tokens.muted, fontSize: "0.8rem", marginTop: "0.4rem" }}>{release.description}</p>}
+                  </>
+                )}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", flexShrink: 0 }}>
                 {release.spotifyUrl && (
@@ -249,7 +287,16 @@ export default function MusicSection({ profile, tokens, isArtist, onUpdate }: Pr
                     {release.tracks!.map(t => (
                       <div key={t.number} style={{ display: "grid", gridTemplateColumns: canEditTracks ? (isMobile ? "24px 1fr 56px 24px" : "32px 1fr 72px 24px") : (isMobile ? "24px 1fr 56px" : "32px 1fr 72px"), padding: "10px 8px", borderBottom: border1, alignItems: "center" }}>
                         <span style={{ ...lbl, color: tokens.muted2 }}>{t.number}</span>
-                        <span style={{ ...body, fontSize: "0.82rem" }}>{t.title}</span>
+                        {canEditTracks ? (
+                          <input
+                            defaultValue={t.title}
+                            onBlur={e => { const v = e.target.value.trim(); if (v) onUpdate?.({ releases: (profile.releases ?? []).map(r => r.title === release.title ? { ...r, tracks: (r.tracks ?? []).map(tk => tk.number === t.number ? { ...tk, title: v } : tk) } : r) }); }}
+                            style={{ ...inp, fontSize: "0.82rem", padding: "3px 6px" }}
+                            placeholder="Track title"
+                          />
+                        ) : (
+                          <span style={{ ...body, fontSize: "0.82rem" }}>{t.title}</span>
+                        )}
                         <span style={{ ...lbl, textAlign: "right" }}>{(t as any).duration || "—"}</span>
                         {canEditTracks && <button onClick={() => handleDeleteTrack(release.title, t.number)} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: 0 }}>✕</button>}
                       </div>

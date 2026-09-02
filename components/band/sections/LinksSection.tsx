@@ -85,20 +85,26 @@ export default function LinksSection({ profile, tokens, isArtist, onUpdate }: Pr
                 <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.6rem" }}>{CAT_ICONS[cat]}  {cat}</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
                   {items.map(link => (
-                    <div key={link.label} style={{ display: "flex", alignItems: "center", borderBottom: `1px solid ${tokens.border2}` }}>
-                      <a href={link.url} target="_blank" rel="noreferrer" style={{
-                        ...T, fontSize: "0.83rem", fontWeight: 300, color: tokens.muted,
-                        textDecoration: "none", display: "flex", alignItems: "center", gap: "0.4rem",
-                        padding: "6px 0", flex: 1,
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.color = tokens.text)}
-                      onMouseLeave={e => (e.currentTarget.style.color = tokens.muted)}
-                      >
-                        {link.label}
-                        <span style={{ ...lbl, color: tokens.muted2, marginLeft: "auto" }}>↗</span>
-                      </a>
+                    <div key={link.label} style={{ display: "flex", alignItems: "center", borderBottom: `1px solid ${tokens.border2}`, gap: "0.4rem", padding: "4px 0" }}>
+                      <span style={{ ...T, fontSize: "0.83rem", fontWeight: 300, color: tokens.muted, flex: "0 0 auto", minWidth: 80 }}>{link.label}</span>
+                      {isArtist ? (
+                        <input
+                          defaultValue={link.url}
+                          placeholder="https://…"
+                          onBlur={e => {
+                            const v = e.target.value.trim();
+                            onUpdate?.({ links: allLinks.map(l => l.label === link.label ? { ...l, url: v } : l) });
+                          }}
+                          style={{ ...inp, flex: 1, padding: "3px 6px", fontSize: "0.75rem" }}
+                        />
+                      ) : (
+                        <a href={link.url} target="_blank" rel="noreferrer" style={{ ...T, fontSize: "0.83rem", fontWeight: 300, color: tokens.muted, textDecoration: "none", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {link.url ? link.url : <span style={{ color: tokens.muted2, fontStyle: "italic" }}>—</span>}
+                          {link.url && <span style={{ ...lbl, color: tokens.muted2, marginLeft: "0.4rem" }}>↗</span>}
+                        </a>
+                      )}
                       {isArtist && (
-                        <button onClick={() => deleteLink(link.label)} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: "0 4px", ...T }}>✕</button>
+                        <button onClick={() => deleteLink(link.label)} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: "0 4px", ...T, flexShrink: 0 }}>✕</button>
                       )}
                     </div>
                   ))}

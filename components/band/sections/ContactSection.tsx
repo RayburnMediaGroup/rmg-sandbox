@@ -21,13 +21,13 @@ export default function ContactSection({ profile, tokens, isArtist, onUpdate, st
   };
 
   const socials = [
-    { label: "Spotify", href: profile.spotify, accent: true },
-    { label: "Apple Music", href: profile.appleMusic, accent: true },
-    { label: "YouTube", href: profile.youtube },
-    { label: "Instagram", href: profile.instagram },
-    { label: "Facebook", href: profile.facebook },
-    { label: "TikTok", href: profile.tiktok },
-  ].filter(s => s.href);
+    { label: "Spotify", key: "spotify" as const, href: profile.spotify, accent: true },
+    { label: "Apple Music", key: "appleMusic" as const, href: profile.appleMusic, accent: true },
+    { label: "YouTube", key: "youtube" as const, href: profile.youtube },
+    { label: "Instagram", key: "instagram" as const, href: profile.instagram },
+    { label: "Facebook", key: "facebook" as const, href: profile.facebook },
+    { label: "TikTok", key: "tiktok" as const, href: profile.tiktok },
+  ];
 
   return (
     <section id="contact" style={{ borderBottom: border1 }}>
@@ -63,10 +63,20 @@ export default function ContactSection({ profile, tokens, isArtist, onUpdate, st
           <div style={card}>
             <p style={{ ...lbl, color: tokens.muted2, marginBottom: "1rem" }}>Streaming &amp; Social</p>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {socials.map(s => (
-                <a key={s.label} href={s.href!} target="_blank" rel="noreferrer" style={{ ...body, fontSize: "0.82rem", color: s.accent ? tokens.accent : tokens.muted, textDecoration: "none" }}>
-                  {s.label} →
-                </a>
+              {socials.filter(s => s.href || isArtist).map(s => (
+                <div key={s.label} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ ...body, fontSize: "0.78rem", color: tokens.muted2, minWidth: 84, flexShrink: 0 }}>{s.label}</span>
+                  {isArtist ? (
+                    <input
+                      defaultValue={s.href ?? ""}
+                      placeholder="https://…"
+                      onBlur={e => onUpdate?.({ [s.key]: e.target.value.trim() })}
+                      style={{ flex: 1, background: "#0e0e0e", border: `1px solid ${tokens.border}`, borderRadius: 4, color: "#d8d8d8", padding: "4px 8px", fontSize: "0.75rem", fontFamily: "Inter, system-ui, sans-serif", outline: "none" }}
+                    />
+                  ) : (
+                    <a href={s.href!} target="_blank" rel="noreferrer" style={{ ...body, fontSize: "0.82rem", color: s.accent ? tokens.accent : tokens.muted, textDecoration: "none" }}>→</a>
+                  )}
+                </div>
               ))}
             </div>
           </div>

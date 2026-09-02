@@ -1,11 +1,11 @@
 "use client";
 import BandPage from "@/components/band/BandPage";
-import { TEMPLATE_BASE_PROFILE } from "@/lib/bandProfile";
+import { TEMPLATE_PROFILE } from "@/lib/bandProfile";
 
 const TEMPLATE_KEY = "bandstack-template-v1";
 const EDIT_KEY = `bandstack-editmode-${TEMPLATE_KEY}`;
 const SESSION_KEY = `bandstack-unlocked-${TEMPLATE_KEY}`;
-const DATA_VERSION = "v4"; // bump to wipe stale localStorage on all clients
+const DATA_VERSION = "v5"; // bump to wipe stale localStorage on all clients
 
 if (typeof window !== "undefined") {
   try {
@@ -24,7 +24,7 @@ export default function TemplatePage() {
   return (
     <BandPage
       profileKey={TEMPLATE_KEY}
-      defaultProfile={TEMPLATE_BASE_PROFILE}
+      defaultProfile={TEMPLATE_PROFILE}
       stagePlotHref="/bandstack/template/stage-plot"
       defaultEditMode={true}
     />

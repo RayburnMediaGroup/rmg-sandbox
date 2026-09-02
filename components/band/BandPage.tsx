@@ -220,21 +220,29 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
                 {!isMobile && <Link href={stagePlotHref} style={{ border: `1px solid ${tokens.border2}`, color: tokens.muted, ...T, fontSize: "0.68rem", letterSpacing: "0.06em", textTransform: "uppercase", textDecoration: "none", padding: "7px 14px", borderRadius: 4 }}>Stage Plot</Link>}
               </div>
 
-              {/* Platform chips — from profile.links only */}
+              {/* Platform chips — always show all 4, dimmed when no URL */}
               <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
-                {(profile.links ?? []).filter(l => (l.url || (editMode || defaultEditMode)) && ["Spotify","Apple Music","YouTube","Amazon Music"].includes(l.label)).map(l => {
+                {(["Spotify","Apple Music","YouTube","Amazon Music"] as const).map(label => {
                   const platformColor: Record<string, string> = {
                     "Spotify": "#1DB954", "Apple Music": "#FC3C44",
                     "YouTube": "#FF0000", "Amazon Music": "#00A8E1",
                   };
-                  const color = platformColor[l.label] ?? tokens.muted2;
-                  return (
-                    <a key={l.label} href={l.url} target="_blank" rel="noreferrer" className="platform-chip" style={{
+                  const color = platformColor[label];
+                  const url = (profile.links ?? []).find(l => l.label === label)?.url ?? "";
+                  const hasUrl = !!url;
+                  return hasUrl ? (
+                    <a key={label} href={url} target="_blank" rel="noreferrer" className="platform-chip" style={{
                       ...lbl, color, textDecoration: "none",
                       border: `1px solid ${color}44`, background: `${color}12`,
                       borderRadius: 3, padding: "3px 8px", fontSize: "0.55rem",
                       ["--chip-color" as string]: color,
-                    }}>{l.label}</a>
+                    }}>{label}</a>
+                  ) : (
+                    <span key={label} style={{
+                      ...lbl, color: tokens.muted2, textDecoration: "none",
+                      border: `1px solid ${tokens.border}`, background: "transparent",
+                      borderRadius: 3, padding: "3px 8px", fontSize: "0.55rem", opacity: 0.35,
+                    }}>{label}</span>
                   );
                 })}
               </div>

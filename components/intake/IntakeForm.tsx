@@ -225,6 +225,7 @@ export default function IntakeForm() {
     const { error } = await supabase.from("bands").insert({ slug, profile });
 
     if (error) {
+      console.error("Supabase insert error:", error.message, error.code, error.details);
       // Fallback: localStorage only
       try {
         localStorage.setItem(TEMPLATE_KEY, JSON.stringify(profile));

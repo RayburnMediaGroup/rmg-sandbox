@@ -27,6 +27,7 @@ import ResourcesSection  from "@/components/band/sections/ResourcesSection";
 import TicketsSection    from "@/components/band/sections/TicketsSection";
 import MailingListSection from "@/components/band/sections/MailingListSection";
 import { isUnlocked }    from "@/lib/artistAuth";
+import EditField         from "@/components/band/EditField";
 import PinUnlock         from "@/components/band/PinUnlock";
 import ArtistDashboard   from "@/components/band/ArtistDashboard";
 
@@ -183,31 +184,45 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
             {/* Identity */}
             <div style={{ flex: 1, minWidth: 0, paddingBottom: 4 }}>
               <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.4rem" }}>
-                {[profile.genre, profile.origin].filter(Boolean).join(" · ")}
+                {(editMode || defaultEditMode) ? (
+                  <>
+                    <EditField value={profile.genre} placeholder="Genre" onSave={v => onUpdate({ genre: v })} accentColor={tokens.accent} style={{ color: tokens.accent, fontSize: "inherit", letterSpacing: "inherit", fontFamily: "inherit", fontWeight: "inherit", textTransform: "inherit" }} />
+                    {" · "}
+                    <EditField value={profile.origin} placeholder="City, ST" onSave={v => onUpdate({ origin: v })} accentColor={tokens.accent} style={{ color: tokens.accent, fontSize: "inherit", letterSpacing: "inherit", fontFamily: "inherit", fontWeight: "inherit", textTransform: "inherit" }} />
+                  </>
+                ) : (
+                  [profile.genre, profile.origin].filter(Boolean).join(" · ")
+                )}
               </p>
               <h1 className="editorial-h1" style={{ fontSize: isMobile ? "clamp(1.6rem, 7vw, 2.4rem)" : "clamp(2rem, 5vw, 3.8rem)", color: tokens.text, margin: "0 0 0.4rem" }}>
-                {profile.name || "Artist Name"}
+                {(editMode || defaultEditMode) ? (
+                  <EditField value={profile.name} placeholder="Your Band Name" onSave={v => onUpdate({ name: v })} accentColor={tokens.accent} style={{ color: tokens.text, fontSize: "inherit", fontWeight: "inherit", fontFamily: "inherit", letterSpacing: "inherit" }} />
+                ) : (
+                  profile.name || "Artist Name"
+                )}
               </h1>
-              {profile.tagline && (
-                <p style={{ ...T, fontSize: isMobile ? "0.8rem" : "0.88rem", fontWeight: 300, color: tokens.muted, lineHeight: 1.6, marginBottom: "1rem", maxWidth: 480 }}>
-                  {profile.tagline}
-                </p>
-              )}
+              <p style={{ ...T, fontSize: isMobile ? "0.8rem" : "0.88rem", fontWeight: 300, color: tokens.muted, lineHeight: 1.6, marginBottom: "1rem", maxWidth: 480 }}>
+                {(editMode || defaultEditMode) ? (
+                  <EditField value={profile.tagline} placeholder="Your tagline here — one sentence that captures your sound." onSave={v => onUpdate({ tagline: v })} accentColor={tokens.accent} style={{ color: tokens.muted, fontSize: "inherit", fontWeight: "inherit", fontFamily: "inherit" }} />
+                ) : (
+                  profile.tagline
+                )}
+              </p>
 
               {/* CTA row */}
               <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.6rem" }}>
                 {profile.spotify && (
                   <a href={profile.spotify} target="_blank" rel="noreferrer" style={{ background: tokens.accent, color: isLt ? "#fff" : "#000", ...T, fontSize: "0.68rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", textDecoration: "none", padding: "8px 16px", borderRadius: 4 }}>Listen</a>
                 )}
-                {profile.bookingEmail && (
-                  <a href={`mailto:${profile.bookingEmail}`} style={{ border: `1px solid ${tokens.border2}`, color: tokens.muted, ...T, fontSize: "0.68rem", letterSpacing: "0.06em", textTransform: "uppercase", textDecoration: "none", padding: "7px 14px", borderRadius: 4 }}>Book</a>
+                {(profile.bookingEmail || (editMode || defaultEditMode)) && (
+                  <a href={profile.bookingEmail ? `mailto:${profile.bookingEmail}` : undefined} style={{ border: `1px solid ${tokens.border2}`, color: tokens.muted, ...T, fontSize: "0.68rem", letterSpacing: "0.06em", textTransform: "uppercase", textDecoration: "none", padding: "7px 14px", borderRadius: 4 }}>Book</a>
                 )}
                 {!isMobile && <Link href={stagePlotHref} style={{ border: `1px solid ${tokens.border2}`, color: tokens.muted, ...T, fontSize: "0.68rem", letterSpacing: "0.06em", textTransform: "uppercase", textDecoration: "none", padding: "7px 14px", borderRadius: 4 }}>Stage Plot</Link>}
               </div>
 
               {/* Platform chips — from profile.links only */}
               <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
-                {(profile.links ?? []).filter(l => l.url && ["Spotify","Apple Music","YouTube","Amazon Music"].includes(l.label)).map(l => {
+                {(profile.links ?? []).filter(l => (l.url || (editMode || defaultEditMode)) && ["Spotify","Apple Music","YouTube","Amazon Music"].includes(l.label)).map(l => {
                   const platformColor: Record<string, string> = {
                     "Spotify": "#1DB954", "Apple Music": "#FC3C44",
                     "YouTube": "#FF0000", "Amazon Music": "#00A8E1",

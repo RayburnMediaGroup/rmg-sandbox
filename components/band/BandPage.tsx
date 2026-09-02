@@ -51,15 +51,16 @@ interface Props {
   profileKey: string;
   defaultProfile: ProfileData;
   stagePlotHref: string;
+  defaultEditMode?: boolean;
 }
 
-export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: Props) {
+export default function BandPage({ profileKey, defaultProfile, stagePlotHref, defaultEditMode = false }: Props) {
   const isMobile = useMobile();
   const [profile, setProfile]               = useState<ProfileData | null>(null);
   const [active, setActive]                 = useState("about");
-  const [artistUnlocked, setArtistUnlocked] = useState(false);
+  const [artistUnlocked, setArtistUnlocked] = useState(defaultEditMode);
   const EDIT_KEY = `bandstack-editmode-${profileKey}`;
-  const [editMode, setEditMode]             = useState(false);
+  const [editMode, setEditMode]             = useState(defaultEditMode);
   const [showPinModal, setShowPinModal]     = useState(false);
   const [showDashboard, setShowDashboard]   = useState(false);
 
@@ -86,8 +87,13 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
 
   useEffect(() => {
     setProfile(loadProfile());
-    setArtistUnlocked(isUnlocked(profileKey));
-    try { const em = sessionStorage.getItem(EDIT_KEY); if (em === "1") setEditMode(true); } catch {}
+    if (defaultEditMode) {
+      setArtistUnlocked(true);
+      setEditMode(true);
+    } else {
+      setArtistUnlocked(isUnlocked(profileKey));
+      try { const em = sessionStorage.getItem(EDIT_KEY); if (em === "1") setEditMode(true); } catch {}
+    }
     try {
       const params = new URLSearchParams(window.location.search);
       const ref = params.get("ref");
@@ -287,34 +293,34 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref }: 
       </div>
 
       {/* Edit mode banner */}
-      {editMode && (
+      {(editMode || defaultEditMode) && (
         <div style={{ background: tokens.accent + "18", borderBottom: `1px solid ${tokens.accent}44`, padding: "7px 40px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <p style={{ ...lbl, color: tokens.accent }}>✏ Edit Mode — click any field to edit · changes save automatically</p>
-          <button onClick={() => { setEditMode(false); try { sessionStorage.removeItem(EDIT_KEY); } catch {}; }} style={{ ...lbl, background: "transparent", border: `1px solid ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, padding: "3px 10px", cursor: "pointer" }}>Done</button>
+          {!defaultEditMode && <button onClick={() => { setEditMode(false); try { sessionStorage.removeItem(EDIT_KEY); } catch {}; }} style={{ ...lbl, background: "transparent", border: `1px solid ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, padding: "3px 10px", cursor: "pointer" }}>Done</button>}
         </div>
       )}
 
       {/* ── Sections ── */}
-      {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
-      {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
+      {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
+      {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "history"    && <HistorySection    profile={profile} tokens={tokens} />}
-      {active === "videos"     && <VideosSection     profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "photos"     && <PhotoSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "gear"       && <GearSection       profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "timeline"   && <TimelineSection   profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "press"      && <PressSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "stats"      && <StatsSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
-      {active === "merch"      && <MerchSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
+      {active === "videos"     && <VideosSection     profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "photos"     && <PhotoSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "gear"       && <GearSection       profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "timeline"   && <TimelineSection   profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "press"      && <PressSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "stats"      && <StatsSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "merch"      && <MerchSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "epk"        && <EPKSection        profile={profile} tokens={tokens} />}
-      {active === "links"      && <LinksSection      profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
+      {active === "links"      && <LinksSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "tickets"    && <TicketsSection    profile={profile} tokens={tokens} />}
-      {active === "mailing-list" && <MailingListSection profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
+      {active === "mailing-list" && <MailingListSection profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "resources"  && <ResourcesSection  tokens={tokens} />}
-      {active === "contact"    && <ContactSection    profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
+      {active === "contact"    && <ContactSection    profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
       {active === "venue-crm"  && artistUnlocked && <VenueCRMSection profile={profile} tokens={tokens} onUpdate={onUpdate} />}
-      {active === "sync"       && <SyncSection       profile={profile} tokens={tokens} isArtist={editMode} onUpdate={onUpdate} />}
+      {active === "sync"       && <SyncSection       profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
 
       {/* PIN modal */}
       {showPinModal && (

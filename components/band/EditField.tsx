@@ -79,7 +79,7 @@ export default function EditField({ value, onSave, multiline, placeholder, style
         ...style,
       }}
     >
-      {value || <span style={{ color: "#555", fontStyle: "italic" }}>{placeholder ?? "Click to edit"}</span>}
+      {value || <span style={{ color: accentColor, opacity: 0.55, fontStyle: "italic" }}>{placeholder ?? "Click to edit"}</span>}
     </span>
   );
 }

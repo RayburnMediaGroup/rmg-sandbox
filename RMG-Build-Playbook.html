@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RMG Build Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+/* ── Tokens ──────────────────────────────────────────── */
+:root {
+  --bg:        #0a0a0f;
+  --surface:   #111118;
+  --surface2:  #1a1a24;
+  --border:    rgba(255,255,255,0.08);
+  --border2:   rgba(255,255,255,0.14);
+  --text:      #e8e8f0;
+  --muted:     rgba(232,232,240,0.50);
+  --faint:     rgba(232,232,240,0.28);
+  --gold:      #f59e0b;
+  --gold-dim:  rgba(245,158,11,0.15);
+  --gold-border: rgba(245,158,11,0.30);
+  --green:     #4ade80;
+  --red:       #f87171;
+  --code-bg:   #0d0d16;
+  --rule:      rgba(255,255,255,0.06);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:        #f5f3ef;
+    --surface:   #ffffff;
+    --surface2:  #f0ede8;
+    --border:    rgba(0,0,0,0.08);
+    --border2:   rgba(0,0,0,0.14);
+    --text:      #18181f;
+    --muted:     rgba(24,24,31,0.52);
+    --faint:     rgba(24,24,31,0.30);
+    --gold:      #c27c00;
+    --gold-dim:  rgba(194,124,0,0.10);
+    --gold-border: rgba(194,124,0,0.28);
+    --green:     #16a34a;
+    --red:       #dc2626;
+    --code-bg:   #ebe8e2;
+    --rule:      rgba(0,0,0,0.07);
+  }
+}
+
+:root[data-theme="light"] {
+  --bg:        #f5f3ef;
+  --surface:   #ffffff;
+  --surface2:  #f0ede8;
+  --border:    rgba(0,0,0,0.08);
+  --border2:   rgba(0,0,0,0.14);
+  --text:      #18181f;
+  --muted:     rgba(24,24,31,0.52);
+  --faint:     rgba(24,24,31,0.30);
+  --gold:      #c27c00;
+  --gold-dim:  rgba(194,124,0,0.10);
+  --gold-border: rgba(194,124,0,0.28);
+  --green:     #16a34a;
+  --red:       #dc2626;
+  --code-bg:   #ebe8e2;
+  --rule:      rgba(0,0,0,0.07);
+}
+
+/* ── Reset ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-weight: 300;
+  line-height: 1.75;
+  font-size: 15px;
+  padding-bottom: 80px;
+}
+
+/* ── Layout ──────────────────────────────────────────── */
+.wrap { max-width: 820px; margin: 0 auto; padding: 0 28px; }
+
+/* ── Header ──────────────────────────────────────────── */
+header {
+  border-bottom: 1px solid var(--rule);
+  padding: 48px 0 40px;
+  margin-bottom: 56px;
+}
+.header-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 300;
+  line-height: 1.0;
+  color: var(--text);
+  text-wrap: balance;
+}
+h1 em { font-style: italic; color: var(--gold); }
+.subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 10px; max-width: 460px; }
+
+/* ── Theme toggle ────────────────────────────────────── */
+.toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.toggle:hover { border-color: var(--border2); color: var(--text); }
+
+/* ── Sections ────────────────────────────────────────── */
+.section { margin-bottom: 52px; }
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 20px;
+  text-wrap: balance;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 12px;
+}
+h3 {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 28px 0 10px;
+}
+p { color: var(--muted); max-width: 68ch; margin-bottom: 12px; }
+strong { color: var(--text); font-weight: 500; }
+
+/* ── Rule grid ───────────────────────────────────────── */
+.rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .rule-grid { grid-template-columns: 1fr; } }
+
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.rule-card.gold { border-left: 3px solid var(--gold); }
+.rule-card.red  { border-left: 3px solid var(--red); }
+.rule-card.green { border-left: 3px solid var(--green); }
+.rule-card p { font-size: 0.83rem; margin: 0; color: var(--muted); }
+.rule-card strong { display: block; font-size: 0.78rem; margin-bottom: 3px; color: var(--text); }
+
+/* ── Stack table ─────────────────────────────────────── */
+.stack-table { width: 100%; border-collapse: collapse; }
+.stack-table th {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  text-align: left;
+  padding: 0 12px 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.stack-table td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.85rem;
+  vertical-align: top;
+  color: var(--muted);
+}
+.stack-table td:first-child { color: var(--text); font-weight: 500; white-space: nowrap; width: 160px; }
+.stack-table td code { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--gold); background: var(--gold-dim); padding: 1px 6px; border-radius: 4px; }
+
+/* ── Code blocks ─────────────────────────────────────── */
+.code-wrap { position: relative; margin: 16px 0; }
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.7;
+  color: var(--text);
+  tab-size: 2;
+}
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.copy-btn:hover { color: var(--text); border-color: var(--border2); }
+.copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+/* ── Workflow steps ──────────────────────────────────── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.step:last-child { border-bottom: none; }
+.step-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--gold);
+  min-width: 28px;
+  padding-top: 2px;
+}
+.step-body p { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.step-body strong { font-size: 0.85rem; }
+
+/* ── Source cards ────────────────────────────────────── */
+.source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .source-grid { grid-template-columns: 1fr; } }
+.source-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+.source-card .label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.source-card h4 { font-size: 0.9rem; font-weight: 500; color: var(--text); margin-bottom: 6px; }
+.source-card p { font-size: 0.78rem; color: var(--muted); margin: 0 0 8px; }
+.source-card a { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--gold); text-decoration: none; opacity: 0.7; }
+.source-card a:hover { opacity: 1; }
+
+/* ── Never list ──────────────────────────────────────── */
+.never-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.never-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.never-list li::before { content: "✕"; color: var(--red); font-family: 'Space Mono', monospace; font-size: 0.65rem; margin-top: 2px; flex-shrink: 0; }
+.never-list strong { color: var(--text); }
+
+/* ── Color swatches ──────────────────────────────────── */
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.swatch { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+.swatch-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
+.swatch-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+
+/* ── Font samples ────────────────────────────────────── */
+.font-sample { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin: 8px 0; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.font-sample .sample-text { font-size: 1.4rem; color: var(--text); }
+.font-sample .sample-meta { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--faint); white-space: nowrap; }
+
+/* ── TOC ─────────────────────────────────────────────── */
+.toc { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 12px; padding: 20px 24px; margin-bottom: 52px; }
+.toc-title { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.toc ol { padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.toc li { font-size: 0.82rem; color: var(--muted); }
+.toc a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+.toc a:hover { color: var(--gold); }
+
+/* ── Print ───────────────────────────────────────────── */
+@media print {
+  body { background: #fff; color: #111; }
+  .toggle { display: none; }
+  pre { border: 1px solid #ddd; background: #f5f5f5; color: #111; }
+  .copy-btn { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="header-inner">
+      <div>
+        <p class="eyebrow">Rayburn Media Group</p>
+        <h1>RMG Build <em>Playbook</em></h1>
+        <p class="subtitle">Stack, design system, workflow, and rules for every corporate site build. Read before touching a file.</p>
+      </div>
+      <button class="toggle" onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <p class="toc-title">Contents</p>
+    <ol>
+      <li><a href="#stack">1 — Technology Stack</a></li>
+      <li><a href="#design">2 — Design System</a></li>
+      <li><a href="#cards">3 — The Card Standard (CSS)</a></li>
+      <li><a href="#structure">4 — File Structure</a></li>
+      <li><a href="#workflow">5 — Build Workflow</a></li>
+      <li><a href="#sources">6 — Component Sources</a></li>
+      <li><a href="#claudemd">7 — CLAUDE.md Template</a></li>
+      <li><a href="#rules">8 — Critical Rules — Never Break</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. Stack -->
+  <section class="section" id="stack">
+    <p class="section-label">01</p>
+    <h2>Technology Stack</h2>
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Choice</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Framework</td><td><code>Next.js 16</code> App Router — never Pages Router. <code>React 19</code>. TypeScript always.</td></tr>
+        <tr><td>Styling</td><td><code>Tailwind CSS v4</code> — uses <code>@import "tailwindcss"</code>, theme tokens inside <code>@theme {}</code>. No CSS modules, no styled-components.</td></tr>
+        <tr><td>Fonts</td><td><strong>Display:</strong> Cormorant Garamond · <strong>Body:</strong> Outfit · <strong>Mono:</strong> Space Mono. Loaded via next/font/google, exposed as CSS variables.</td></tr>
+        <tr><td>Icons</td><td><code>lucide-react</code> only. No heroicons, no FontAwesome.</td></tr>
+        <tr><td>Animation</td><td>CSS + IntersectionObserver (FadeIn component). <strong>No Framer Motion</strong> — 148KB unused JS penalty.</td></tr>
+        <tr><td>Images</td><td>Native <code>&lt;img&gt;</code> with <code>loading="lazy"</code>. Format: <code>.webp</code>, max 1920px wide, cwebp q82. No next/image.</td></tr>
+        <tr><td>Deployment</td><td>Vercel via GitHub auto-deploy. Push to main = live. Never Vercel CLI direct upload.</td></tr>
+        <tr><td>Repos</td><td>One repo per client under <code>RayburnMediaGroup</code> org on GitHub.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 2. Design -->
+  <section class="section" id="design">
+    <p class="section-label">02</p>
+    <h2>Design System</h2>
+
+    <h3>Color — Dark-First, Dual-Theme Ready</h3>
+    <p style="margin-bottom:12px;">Dark is the RMG default and primary look. Every site ships with a dark/light toggle — the same CSS token system used in this document. Light theme is warm parchment, never pure white corporate.</p>
+    <div class="swatches">
+      <div class="swatch"><div class="swatch-dot" style="background:#0a0a0f;border:1px solid rgba(255,255,255,0.15)"></div><span class="swatch-label">#0a0a0f — dark bg</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#111118;border:1px solid rgba(255,255,255,0.15)"></div><span class="swatch-label">#111118 — dark surface</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#f5f3ef;border:1px solid rgba(0,0,0,0.12)"></div><span class="swatch-label">#f5f3ef — light bg</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#ffffff;border:1px solid rgba(0,0,0,0.12)"></div><span class="swatch-label">#ffffff — light surface</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#f59e0b"></div><span class="swatch-label">#f59e0b — gold (dark)</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#c27c00"></div><span class="swatch-label">#c27c00 — gold (light)</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#0ea5e9"></div><span class="swatch-label">#0ea5e9 — ocean</span></div>
+      <div class="swatch"><div class="swatch-dot" style="background:#f97316"></div><span class="swatch-label">#f97316 — sunset</span></div>
+    </div>
+    <p>One brand accent per client. Glass surfaces: <code>rgba(255,255,255,0.04)</code> dark / <code>rgba(0,0,0,0.04)</code> light. Accent shifts darker in light mode for legibility. See the CSS token pattern in this document.</p>
+
+    <h3>Dual-Theme CSS Pattern (All Future Builds)</h3>
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>/* Dark-first token system — use on every build */
+:root {
+  /* Complete dark palette defined here */
+  --bg: #0a0a0f;  --surface: #111118;  --surface2: #1a1a24;
+  --text: #e8e8f0;  --muted: rgba(232,232,240,0.50);
+  --accent: #f59e0b;  --accent-dim: rgba(245,158,11,0.15);
+}
+
+/* System preference: dark — beats un-stamped document */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f5f3ef;  --surface: #ffffff;  --surface2: #f0ede8;
+    --text: #18181f;  --muted: rgba(24,24,31,0.52);
+    --accent: #c27c00;  --accent-dim: rgba(194,124,0,0.10);
+  }
+}
+
+/* Explicit toggle — wins over system preference */
+:root[data-theme="light"] {
+  --bg: #f5f3ef;  --surface: #ffffff;  --surface2: #f0ede8;
+  --text: #18181f;  --muted: rgba(24,24,31,0.52);
+  --accent: #c27c00;  --accent-dim: rgba(194,124,0,0.10);
+}
+
+/* Required: body must have explicit background token */
+body { background: var(--bg); color: var(--text); }
+
+/* JS toggle button */
+function toggleTheme() {
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', h.dataset.theme);
+}
+/* Restore saved preference on load (add to &lt;head&gt;): */
+const t = localStorage.getItem('theme');
+if (t) document.documentElement.dataset.theme = t;</pre>
+    </div>
+
+    <h3>Typography — Chosen Per Client, Never the Same Twice</h3>
+    <p>Every site gets a font pair chosen for <em>that</em> brand — not a house font. Pick a display face that matches the industry's personality, pair it with a clean readable body face. Below are proven options, not requirements.</p>
+    <div class="font-sample">
+      <span class="sample-text" style="font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;">Cormorant Garamond — Luxury / Hospitality / Editorial</span>
+      <span class="sample-meta">Thin, elegant, high-end</span>
+    </div>
+    <div class="font-sample">
+      <span class="sample-text" style="font-family:'Outfit',system-ui,sans-serif;font-weight:300;font-size:1rem;">Outfit — Modern / Tech / Services</span>
+      <span class="sample-meta">Clean, geometric, very legible</span>
+    </div>
+    <div class="font-sample">
+      <span class="sample-text" style="font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Space Mono — Labels / Eyebrows / Data UI</span>
+      <span class="sample-meta">Technical precision, monospaced</span>
+    </div>
+    <p style="margin-top:8px;">Research Google Fonts for each new client. Look at the industry: a roofing company might get a strong slab serif. A spa gets something thin and airy. A law firm gets a sharp transitional serif. The font is part of the brand — make it a conscious decision.</p>
+
+    <h3>Visual Language</h3>
+    <div class="rule-grid">
+      <div class="rule-card gold"><strong>Rounded everywhere</strong><p>Cards 1.25rem, buttons 9999px pill, badges 9999px.</p></div>
+      <div class="rule-card gold"><strong>Glass morphism</strong><p>backdrop-filter blur(24px) saturate(180%) on cards and nav.</p></div>
+      <div class="rule-card gold"><strong>Layered depth</strong><p>Sections alternate bg colors. Never flat single-tone pages.</p></div>
+      <div class="rule-card gold"><strong>Gradient text accents</strong><p>Key words use text-sunset or text-ocean gradient clips.</p></div>
+      <div class="rule-card gold"><strong>Hover: lift + shadow</strong><p>Cards translateY(-4px) + deeper shadow. Images scale(1.05).</p></div>
+      <div class="rule-card gold"><strong>Sticky glass nav</strong><p>backdrop-filter as inline style — Tailwind v4 strips it from classes.</p></div>
+    </div>
+
+    <h3>Trending Patterns to Use</h3>
+    <div class="rule-grid">
+      <div class="rule-card"><strong>Horizontal scroll strips</strong><p>Mobile-first card rows. Always add padding-top + overflow-y:hidden.</p></div>
+      <div class="rule-card"><strong>Eyebrow → Display → Lead</strong><p>Every section opens this way. Never skip the eyebrow label.</p></div>
+      <div class="rule-card"><strong>Stat / signal grids</strong><p>3-col numbers with accent colors. Shows authority fast.</p></div>
+      <div class="rule-card"><strong>Editorial 2-col alternating</strong><p>Image left + text right, then flip. FeaturedSection pattern.</p></div>
+      <div class="rule-card"><strong>Full-bleed video hero</strong><p>Autoplay muted loop. Text overlay with display heading + CTA.</p></div>
+      <div class="rule-card"><strong>Floating card badges</strong><p>Category, rating, or tag overlaid on card image — absolute positioned.</p></div>
+    </div>
+  </section>
+
+  <!-- 3. Cards -->
+  <section class="section" id="cards">
+    <p class="section-label">03</p>
+    <h2>The Card Standard — Add to globals.css Day 1</h2>
+    <p>This is locked. Never rewrite. Never add z-index, position, will-change, isolation, or contain to glass-card. See <strong>rmg-components</strong> for full component files.</p>
+
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>/* ─── Glass Card ─────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.5),
+              inset 0 1px 0 rgba(255,255,255,0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.13);
+  transform: translateY(-4px);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6),
+              inset 0 1px 0 rgba(255,255,255,0.12);
+}
+
+/* ─── Card image system ───────────────────────────── */
+/* border-radius:inherit prevents GPU layer from      */
+/* squaring corners during hover image zoom           */
+.overflow-hidden > img {
+  border-radius: inherit;
+}
+.glass-card > .overflow-hidden:first-child {
+  border-radius: 1.25rem 1.25rem 0 0;
+}
+
+/* ─── Horizontal scroll strips ───────────────────── */
+/* overflow-x:auto forces overflow-y:auto (CSS spec). */
+/* padding-top:8px = room for hover lift inside clip. */
+/* overflow-y:hidden = blocks two-finger vertical     */
+/* scroll pushing cards into the clip zone.           */
+.overflow-x-auto {
+  padding-top: 8px;
+  overflow-y: hidden;
+}</pre>
+    </div>
+
+    <h3>JSX Pattern — Standard Card</h3>
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>&lt;Link href="..." className="group block glass-card overflow-hidden h-full"&gt;
+  &lt;!-- Image wrapper: overflow-hidden + radius here, NOT on the card --&gt;
+  &lt;div className="relative overflow-hidden aspect-[16/10]"&gt;
+    &lt;img
+      src="..."
+      alt="..."
+      className="w-full h-full object-cover
+                 transition-transform duration-700
+                 group-hover:scale-105"
+      loading="lazy"
+      width={800}
+      height={500}
+    /&gt;
+  &lt;/div&gt;
+  &lt;div className="p-6"&gt;
+    &lt;!-- content --&gt;
+  &lt;/div&gt;
+&lt;/Link&gt;</pre>
+    </div>
+  </section>
+
+  <!-- 4. Structure -->
+  <section class="section" id="structure">
+    <p class="section-label">04</p>
+    <h2>File Structure — Every Build</h2>
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>client-site-next/
+├── app/
+│   ├── layout.tsx          ← fonts, metadata, globals import
+│   ├── page.tsx            ← homepage
+│   ├── globals.css         ← ALL styles + RMG card standard on day 1
+│   └── [section]/
+│       └── page.tsx        ← one file per route
+├── components/
+│   ├── Navbar.tsx          ← glass nav, backdrop-filter as INLINE STYLE
+│   ├── Hero.tsx            ← full-bleed video or image
+│   ├── FadeIn.tsx          ← IntersectionObserver scroll reveal
+│   ├── Footer.tsx
+│   ├── PageHero.tsx        ← reusable inner page hero
+│   ├── ListingCard.tsx     ← standard glass card
+│   └── [Section].tsx       ← one component per homepage section
+├── lib/
+│   └── data.ts             ← ALL content data (typed)
+├── public/
+│   └── images/             ← ALL images — single source of truth
+└── next.config.ts          ← security headers</pre>
+    </div>
+  </section>
+
+  <!-- 5. Workflow -->
+  <section class="section" id="workflow">
+    <p class="section-label">05</p>
+    <h2>Build Workflow</h2>
+
+    <h3>Phase 1 — Scaffold</h3>
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><div class="step-body"><p><code>npx create-next-app@latest client-name-next --typescript --tailwind --app --no-src-dir --no-import-alias --yes</code></p></div></div>
+      <div class="step"><span class="step-num">02</span><div class="step-body"><p>Delete all boilerplate. Add RMG card standard CSS to globals.css immediately.</p></div></div>
+      <div class="step"><span class="step-num">03</span><div class="step-body"><p>Set up fonts in layout.tsx: Cormorant Garamond + Outfit + Space Mono via next/font/google.</p></div></div>
+      <div class="step"><span class="step-num">04</span><div class="step-body"><p><code>gh repo create RayburnMediaGroup/client-name-next --public --source . --push</code> then connect to Vercel.</p></div></div>
+    </div>
+
+    <h3>Phase 2 — Content & Data</h3>
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><div class="step-body"><p>Audit the client's existing site with <strong>Harpoon</strong> at <code>audit.rayburnmedia.com/?owner=1</code>.</p></div></div>
+      <div class="step"><span class="step-num">02</span><div class="step-body"><p>Pull all content into <code>lib/data.ts</code> — listings, cards, nav items, everything typed.</p></div></div>
+      <div class="step"><span class="step-num">03</span><div class="step-body"><p>Copy all images to <code>public/images/</code> immediately. Compress: max 1920px, cwebp q82.</p></div></div>
+    </div>
+
+    <h3>Phase 3 — Build Order</h3>
+    <div class="steps">
+      <div class="step"><span class="step-num">01</span><div class="step-body"><p><strong>Navbar</strong> — glass, sticky, mobile hamburger, backdrop-filter as inline style.</p></div></div>
+      <div class="step"><span class="step-num">02</span><div class="step-body"><p><strong>Hero</strong> — full-bleed image or video, display heading, CTA button.</p></div></div>
+      <div class="step"><span class="step-num">03</span><div class="step-body"><p><strong>Homepage sections</strong> — 2–4 key sections using glass cards and editorial layouts.</p></div></div>
+      <div class="step"><span class="step-num">04</span><div class="step-body"><p><strong>Footer</strong> then inner pages, then Schema/JsonLd on every page, then sitemap.</p></div></div>
+    </div>
+
+    <h3>Phase 4 — Check Along the Way</h3>
+    <div class="steps">
+      <div class="step"><span class="step-num">→</span><div class="step-body"><p>Run Harpoon on the Vercel preview URL after each major section.</p></div></div>
+      <div class="step"><span class="step-num">→</span><div class="step-body"><p>Check PageSpeed score. Target <strong>90+ mobile</strong>.</p></div></div>
+      <div class="step"><span class="step-num">→</span><div class="step-body"><p><code>npm run build</code> locally before every push. Never push broken builds.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 6. Sources -->
+  <section class="section" id="sources">
+    <p class="section-label">06</p>
+    <h2>Component Sources</h2>
+    <div class="source-grid">
+      <div class="source-card">
+        <p class="label">First Stop</p>
+        <h4>RMG Components</h4>
+        <p>Production-tested. Both Next.js and plain HTML/CSS. Confirmed working on real sites.</p>
+        <a href="https://github.com/RayburnMediaGroup/rmg-components" target="_blank">github.com/RayburnMediaGroup/rmg-components →</a>
+      </div>
+      <div class="source-card">
+        <p class="label">Test New Ideas</p>
+        <h4>RMG Sandbox</h4>
+        <p>Build experimental components here. Confirm working. Then add to rmg-components.</p>
+        <a href="https://rmg-sandbox.vercel.app" target="_blank">rmg-sandbox.vercel.app →</a>
+      </div>
+      <div class="source-card">
+        <p class="label">Audit Tool</p>
+        <h4>Harpoon</h4>
+        <p>Audit client's old site before building. Score the new build after deploying.</p>
+        <a href="https://audit.rayburnmedia.com/?owner=1" target="_blank">audit.rayburnmedia.com →</a>
+      </div>
+      <div class="source-card">
+        <p class="label">Inspiration Only</p>
+        <h4>GitHub Research</h4>
+        <p>Search next.js dark theme components. shadcn/ui for patterns — implement from scratch, never install the package.</p>
+        <a href="https://github.com" target="_blank">github.com →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CLAUDE.md template -->
+  <section class="section" id="claudemd">
+    <p class="section-label">07</p>
+    <h2>CLAUDE.md — Drop This in Every Client Repo</h2>
+    <p>Create this file at the repo root on day one. It travels with the project — new conversation, fresh Claude, it reads this first and picks up clean. Fill in the bracketed placeholders with real decisions before you build anything.</p>
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre># [Client Name] — Claude Code Project Rules
+
+## Stack — Never Deviate
+- Next.js 16 App Router · TypeScript · React 19
+- Tailwind CSS v4 — `@import "tailwindcss"`, tokens in `@theme {}`
+- Icons: lucide-react only
+- Animation: CSS + IntersectionObserver (FadeIn.tsx) — NO Framer Motion
+- Images: native `&lt;img&gt;` loading="lazy", .webp, max 1920px, cwebp q82
+- Deploy: Vercel via GitHub auto-deploy — never CLI direct upload
+
+## Fonts — This Project
+- Display: [e.g. Cormorant Garamond — chosen because luxury hospitality brand]
+- Body:    [e.g. Outfit — clean, geometric, pairs well with display]
+- Mono:    [e.g. Space Mono — eyebrow labels and data]
+- Loaded in layout.tsx via next/font/google as --font-display / --font-body / --font-mono
+
+## Colors — This Project
+- Dark bg:    [e.g. #0a0a0f]
+- Surface:    [e.g. #111118]
+- Accent:     [e.g. #f59e0b dark / #c27c00 light — gold, client brand color]
+- All sites ship with dark/light toggle. See globals.css token pattern.
+
+## Card Standard — READ-ONLY, Never Change
+Add to globals.css on day 1 and never rewrite:
+- .glass-card: backdrop-filter blur(24px), border-radius 1.25rem, translateY(-4px) on hover
+- .overflow-x-auto: padding-top 8px + overflow-y hidden (prevents scroll-strip clip)
+- .overflow-hidden > img: border-radius inherit (prevents GPU layer corner squaring)
+- NEVER add z-index, position, will-change, isolation, or contain to .glass-card
+
+## Invented Copy — Always Mark It
+Every placeholder title, paragraph, or stat that is NOT from the client:
+1. Prefix the string inline: ⚠ This is invented copy — replace before launch
+2. Add fixed draft badge to layout.tsx (amber pill, bottom-right, z-index 9999)
+Remove the badge only after client has reviewed and approved ALL copy.
+
+## File Rules
+- public/ is single source of truth — copy ALL images there immediately
+- lib/data.ts holds ALL content (typed) — no hardcoded strings in components
+- One component per section — no mega-files
+- `npm run build` must pass locally before every push — never push broken builds
+
+## Never Do These
+- No Framer Motion
+- No base64 encoding anything
+- No overflow-hidden on section containers (clips card hover lift)
+- No fabricating data, stats, or client claims — mark invented copy with ⚠
+- No in-app browser tool — read code and ask user to verify instead
+- No z-index / will-change / isolation / contain on .glass-card
+- No touching [master reference repo if applicable] — read-only
+
+## Build Order
+1. globals.css (card standard + token system)
+2. layout.tsx (fonts + metadata + draft badge if SiteStack)
+3. lib/data.ts (all content typed)
+4. Navbar → Hero → Homepage sections → Footer
+5. Inner pages → Schema/JsonLd → sitemap
+6. `npm run build` → push → Harpoon audit on Vercel preview URL
+
+## Port
+[e.g. 3016 — check ~/Desktop for other running projects to avoid conflict]</pre>
+    </div>
+  </section>
+
+  <!-- 8. Rules -->
+  <section class="section" id="rules">
+    <p class="section-label">08</p>
+    <h2>Critical Rules — Never Break</h2>
+
+    <h3>⚠ Invented Copy — Always Mark It</h3>
+    <p>When a build requires placeholder titles, descriptions, or paragraphs before real client content exists, every invented line gets marked. No exceptions. The client must always know what is real and what needs to be replaced.</p>
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      <pre>/* 1. Inline amber ⚠ on every invented string */
+&lt;h2&gt;⚠ Roofing Solutions Built to Last&lt;/h2&gt;
+&lt;p&gt;⚠ Placeholder — replace with client-provided copy before launch.&lt;/p&gt;
+
+/* 2. Sitewide draft badge — add to layout.tsx on every SiteStack build */
+&lt;div style={{
+  position: "fixed", bottom: 16, right: 16, zIndex: 9999,
+  background: "#f59e0b", color: "#000",
+  padding: "6px 14px", borderRadius: 9999,
+  fontSize: "0.7rem", fontWeight: 700,
+  letterSpacing: "0.1em", textTransform: "uppercase",
+  pointerEvents: "none"
+}}&gt;
+  ⚠ DRAFT — Copy Not Approved
+&lt;/div&gt;</pre>
+    </div>
+    <p style="margin-top:8px;">Remove the layout badge only when the client has reviewed and signed off on all copy. Keep the inline ⚠ markers until final client approval — they survive in the git diff as a paper trail.</p>
+
+    <h3>Never Do These</h3>
+    <ul class="never-list">
+      <li><span><strong>No Framer Motion.</strong> 148KB unused JS penalty. Use CSS + IntersectionObserver.</span></li>
+      <li><span><strong>No overflow-hidden on section containers.</strong> Clips card hover lift. Only on image wrappers inside cards.</span></li>
+      <li><span><strong>No z-index, position, will-change, isolation, or contain on glass-card.</strong> All cause clipping or blur bugs.</span></li>
+      <li><span><strong>No base64.</strong> Causes session freeze and server errors. Reference files by path only.</span></li>
+      <li><span><strong>No in-app browser tool.</strong> Always fails, wastes 15 minutes. Read code and ask user to verify instead.</span></li>
+      <li><span><strong>No fabricated content.</strong> Only real client data or cited sources. Mark invented copy with ⚠ in SiteStack builds.</span></li>
+      <li><span><strong>Navbar backdrop-filter must be inline style.</strong> Tailwind v4 strips it from CSS classes.</span></li>
+      <li><span><strong>public/ is single source of truth.</strong> Copy ALL images there immediately. Never rely on Desktop or external drives.</span></li>
+      <li><span><strong>npm run build must pass before every push.</strong> Never deploy a broken build.</span></li>
+      <li><span><strong>Ask before any destructive action.</strong> Backup, confirm, then proceed.</span></li>
+      <li><span><strong>Never touch best-of-cabo-next.</strong> Hostinger production. READ-ONLY reference.</span></li>
+      <li><span><strong>Output files to ~/Desktop.</strong> No subfolders except CLAUDE DATA BACKUPS.</span></li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+}
+
+function copyCode(btn) {
+  const pre = btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+  });
+}
+</script>
+</body>
+</html>

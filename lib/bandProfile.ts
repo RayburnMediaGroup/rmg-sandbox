@@ -102,6 +102,93 @@ export interface ProfileData {
 
 export const PROFILE_KEY = "bandstack-profile-v1";
 
+export const BLANK_PROFILE: ProfileData = {
+  name: "", contactEmail: "", genre: "", tagline: "", origin: "", founded: "",
+  bio: "", members: [], releases: [], shows: [], bookingEmail: "", bookingContact: "",
+  instagram: "", spotify: "", appleMusic: "", youtube: "", facebook: "", tiktok: "",
+  heroImage: "", coverImage: "", albumArt: "", colorMode: "dark",
+  appleMusicArtistId: "", merchUrl: "", pressQuotes: [], awards: [], links: [],
+  gear: [], venues: [], videos: [], showHistory: [],
+};
+
+export const TEMPLATE_PROFILE: ProfileData = {
+  name: "Your Band Name",
+  contactEmail: "your@email.com",
+  genre: "Rock",
+  tagline: "Your tagline here — one sentence that captures your sound.",
+  origin: "Your City, ST",
+  founded: "2020",
+  bio: "Your Band Name is your band info here. Write 2–4 paragraphs about your origin story, your sound, what drives you, and where you've been. This is your artist statement — make it yours.",
+  members: [
+    { name: "Your Name", role: "Vocals / Guitar" },
+    { name: "Band Member", role: "Bass" },
+    { name: "Band Member", role: "Drums" },
+  ],
+  releases: [
+    {
+      title: "Your Album Title",
+      type: "album",
+      year: "2024",
+      description: "Your album description here — what inspired it, what it sounds like, what it means.",
+      spotifyUrl: "",
+      coverArt: "",
+      tracks: [
+        { number: 1, title: "Your Track Title", duration: "3:30" },
+        { number: 2, title: "Your Track Title", duration: "4:00" },
+        { number: 3, title: "Your Track Title", duration: "3:15" },
+      ],
+    },
+  ],
+  shows: [
+    { date: "2025-01-15", venue: "Your Venue Name", city: "Your City", state: "ST", ticketUrl: "", status: "upcoming", notes: "Your show notes here" },
+    { date: "2025-02-20", venue: "Your Venue Name", city: "Your City", state: "ST", ticketUrl: "", status: "upcoming", notes: "" },
+  ],
+  bookingEmail: "booking@youremail.com",
+  bookingContact: "Your Booking Contact",
+  instagram: "",
+  spotify: "",
+  appleMusic: "",
+  youtube: "",
+  facebook: "",
+  tiktok: "",
+  heroImage: "",
+  coverImage: "",
+  albumArt: "",
+  colorMode: "dark",
+  appleMusicArtistId: "",
+  merchUrl: "",
+  pressQuotes: [
+    { quote: "Your press quote here — paste a line from a review, interview, or feature.", source: "Publication Name", year: 2024 },
+  ],
+  awards: ["Your award or recognition here", "Chart position, nomination, or milestone"],
+  links: [
+    { label: "Official Website", url: "https://yourwebsite.com", category: "web" },
+    { label: "Spotify", url: "", category: "streaming" },
+    { label: "Apple Music", url: "", category: "streaming" },
+  ],
+  gear: [
+    { member: "Your Name", role: "Guitar", gear: [{ category: "Guitar", name: "Your Guitar" }, { category: "Amp", name: "Your Amp" }] },
+    { member: "Band Member", role: "Bass", gear: [{ category: "Bass", name: "Your Bass" }, { category: "Amp", name: "Your Amp" }] },
+  ],
+  venues: [],
+  videos: [
+    { title: "Your Video Title", youtubeId: "", date: "" },
+  ],
+  showHistory: [],
+  milestones: ["Your milestone here — first major show, album release, radio play, etc."],
+  influences: ["Your Influence", "Your Influence", "Your Influence"],
+  syncProfile: {
+    pro: "BMI",
+    publisher: "Your Publishing Name",
+    contactEmail: "sync@youremail.com",
+    stemFilesAvailable: false,
+    instrumentalVersionsAvailable: false,
+    tracks: [
+      { title: "Your Track Title", albumTitle: "Your Album", bpm: 120, musicalKey: "G Major", duration: "3:30", mood: ["Your Mood"], theme: ["Your Theme"], instrumentation: ["Guitar", "Bass", "Drums"], explicit: false, hasInstrumental: false, hasStems: false, licensingStatus: "available", notes: "Your licensing notes here." },
+    ],
+  },
+};
+
 export const DEMO_PROFILE: ProfileData = {
   name: artist.name,
   contactEmail: artist.bookingEmail ?? "",

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ProfileData } from "@/lib/bandProfile";
+import { supabase } from "@/lib/supabase";
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -199,16 +200,42 @@ export default function IntakeForm() {
     return links;
   }
 
-  function submit() {
-    try {
-      const profile = buildProfile();
-      localStorage.setItem(TEMPLATE_KEY, JSON.stringify(profile));
-      localStorage.setItem(`${TEMPLATE_KEY}-dataversion`, DATA_VERSION);
-      sessionStorage.setItem(`bandstack-unlocked-${TEMPLATE_KEY}`, "1");
-      sessionStorage.setItem(`bandstack-editmode-${TEMPLATE_KEY}`, "1");
-    } catch {}
+  function toSlug(name: string): string {
+    return name.toLowerCase().trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+  }
+
+  async function submit() {
     setSubmitted(true);
-    setTimeout(() => router.push("/bandstack/template"), 1200);
+    const profile = buildProfile();
+    const baseSlug = toSlug(f.name) || "band";
+
+    // Try slug, append number if taken
+    let slug = baseSlug;
+    let attempts = 0;
+    while (attempts < 10) {
+      const { data } = await supabase.from("bands").select("id").eq("slug", slug).maybeSingle();
+      if (!data) break;
+      attempts++;
+      slug = `${baseSlug}-${attempts}`;
+    }
+
+    const { error } = await supabase.from("bands").insert({ slug, profile });
+
+    if (error) {
+      // Fallback: localStorage only
+      try {
+        localStorage.setItem(TEMPLATE_KEY, JSON.stringify(profile));
+        localStorage.setItem(`${TEMPLATE_KEY}-dataversion`, DATA_VERSION);
+        sessionStorage.setItem(`bandstack-unlocked-${TEMPLATE_KEY}`, "1");
+        sessionStorage.setItem(`bandstack-editmode-${TEMPLATE_KEY}`, "1");
+      } catch {}
+      router.push("/bandstack/template");
+    } else {
+      router.push(`/bandstack/${slug}`);
+    }
   }
 
   // ── Submitted screen ──────────────────────────────────────────────

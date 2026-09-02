@@ -285,6 +285,61 @@ export const DEMO_PROFILE: ProfileData = {
   },
 };
 
+// Template base — identical structure to DEMO_PROFILE so every section works,
+// but personal identifying fields are replaced with placeholders.
+export const TEMPLATE_BASE_PROFILE: ProfileData = {
+  ...DEMO_PROFILE,
+  name: "Your Band Name",
+  contactEmail: "your@email.com",
+  genre: "Americana",
+  tagline: "Your tagline here — one sentence that captures your sound.",
+  origin: "Your City, ST",
+  bio: "Your Band Name is your band info here. Write 2–4 paragraphs about your origin story, your sound, what drives you, and where you've been.",
+  members: [
+    { name: "Your Name", role: "Vocals / Guitar" },
+    { name: "Band Member", role: "Bass" },
+    { name: "Band Member", role: "Drums" },
+  ],
+  bookingEmail: "booking@youremail.com",
+  bookingContact: "Your Booking Contact",
+  instagram: "",
+  spotify: "",
+  appleMusic: "",
+  youtube: "",
+  facebook: "",
+  tiktok: "",
+  heroImage: "",
+  coverImage: "",
+  appleMusicArtistId: "",
+  youtubeChannelId: "",
+  pressQuotes: [
+    { quote: "Your press quote here — paste a line from a review, interview, or feature.", source: "Publication Name", year: 2024 },
+  ],
+  awards: ["Your award or recognition here", "Chart position, nomination, or milestone"],
+  links: [
+    { label: "Spotify", url: "", category: "Streaming" },
+    { label: "Apple Music", url: "", category: "Streaming" },
+    { label: "Amazon Music", url: "", category: "Streaming" },
+    { label: "YouTube Music", url: "", category: "Streaming" },
+    { label: "Pandora", url: "", category: "Streaming" },
+    { label: "iHeart Radio", url: "", category: "Streaming" },
+    { label: "SoundCloud", url: "", category: "Streaming" },
+    { label: "YouTube", url: "", category: "Video" },
+    { label: "Vevo", url: "", category: "Video" },
+    { label: "Instagram", url: "", category: "Social" },
+    { label: "Facebook", url: "", category: "Social" },
+    { label: "TikTok", url: "", category: "Social" },
+    { label: "X / Twitter", url: "", category: "Social" },
+    { label: "Official Store", url: "", category: "Purchase" },
+    { label: "iTunes", url: "", category: "Purchase" },
+    { label: "Bandsintown", url: "", category: "Discovery" },
+    { label: "Songkick", url: "", category: "Discovery" },
+    { label: "Official Website", url: "", category: "Official" },
+    { label: "Newsletter Signup", url: "", category: "Official" },
+    { label: "Booking", url: "", category: "Official" },
+  ],
+};
+
 function buildVenuesFromShows(shows: typeof dataShows): VenueRecord[] {
   const map = new Map<string, VenueRecord>();
   shows.filter(s => s.status === "past").forEach(s => {

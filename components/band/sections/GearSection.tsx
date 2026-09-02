@@ -86,8 +86,47 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
                     return (
                       <div key={itemIdx} style={{ padding: "7px 0", borderBottom: border2, display: "flex", alignItems: "flex-start", gap: "0.4rem" }}>
                         <div style={{ flex: 1 }}>
-                          <p style={{ ...T, fontSize: "0.82rem", fontWeight: 500, color: tokens.text }}>{item.name}</p>
-                          {item.detail && <p style={{ ...lbl, marginTop: "0.1rem", color: tokens.muted2 }}>{item.detail}</p>}
+                          {isArtist ? (
+                            <>
+                              <input
+                                defaultValue={item.name}
+                                placeholder="Gear name"
+                                onBlur={e => {
+                                  const v = e.target.value.trim();
+                                  if (!v || v === item.name) return;
+                                  const nextGear = [...gearData];
+                                  const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                  if (mIdx < 0) return;
+                                  const newItems = [...nextGear[mIdx].gear];
+                                  newItems[globalGearIdx] = { ...newItems[globalGearIdx], name: v };
+                                  nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                  onUpdate?.({ gear: nextGear });
+                                }}
+                                style={{ ...inputStyle, fontWeight: 500, marginBottom: "0.2rem" }}
+                              />
+                              <input
+                                defaultValue={item.detail ?? ""}
+                                placeholder="Detail (optional)"
+                                onBlur={e => {
+                                  const v = e.target.value.trim();
+                                  if (v === (item.detail ?? "")) return;
+                                  const nextGear = [...gearData];
+                                  const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                  if (mIdx < 0) return;
+                                  const newItems = [...nextGear[mIdx].gear];
+                                  newItems[globalGearIdx] = { ...newItems[globalGearIdx], detail: v || undefined };
+                                  nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                  onUpdate?.({ gear: nextGear });
+                                }}
+                                style={{ ...inputStyle, fontSize: "0.7rem" }}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <p style={{ ...T, fontSize: "0.82rem", fontWeight: 500, color: tokens.text }}>{item.name}</p>
+                              {item.detail && <p style={{ ...lbl, marginTop: "0.1rem", color: tokens.muted2 }}>{item.detail}</p>}
+                            </>
+                          )}
                         </div>
                         {isArtist && (
                           <button onClick={() => {

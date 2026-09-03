@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMobile } from "@/lib/useMobile";
 import { resolveTokens, applyMode } from "@/lib/genreTokens";
 import { type ProfileData } from "@/lib/bandProfile";
+import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
 import MusicSection      from "@/components/band/sections/MusicSection";
@@ -53,9 +54,10 @@ interface Props {
   defaultProfile: ProfileData;
   stagePlotHref: string;
   defaultEditMode?: boolean;
+  supabaseSlug?: string; // when set, all edits write back to Supabase
 }
 
-export default function BandPage({ profileKey, defaultProfile, stagePlotHref, defaultEditMode = false }: Props) {
+export default function BandPage({ profileKey, defaultProfile, stagePlotHref, defaultEditMode = false, supabaseSlug }: Props) {
   const isMobile = useMobile();
   const [profile, setProfile]               = useState<ProfileData | null>(null);
   const [active, setActive]                 = useState("about");
@@ -64,6 +66,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
   const [editMode, setEditMode]             = useState(defaultEditMode);
   const [showPinModal, setShowPinModal]     = useState(false);
   const [showDashboard, setShowDashboard]   = useState(false);
+  const supabaseSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function loadProfile(): ProfileData {
     try {
@@ -74,7 +77,17 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
   }
 
   function saveProfile(p: ProfileData) {
+    // Always save to localStorage
     try { localStorage.setItem(profileKey, JSON.stringify(p)); } catch {}
+    // Debounce Supabase write (500ms) when a slug is present
+    if (supabaseSlug) {
+      if (supabaseSaveTimer.current) clearTimeout(supabaseSaveTimer.current);
+      supabaseSaveTimer.current = setTimeout(() => {
+        supabase.from("bands").update({ profile: p, updated_at: new Date().toISOString() }).eq("slug", supabaseSlug).then(({ error }) => {
+          if (error) console.error("Supabase save error:", error.message);
+        });
+      }, 500);
+    }
   }
 
   function onUpdate(updates: Partial<ProfileData>) {

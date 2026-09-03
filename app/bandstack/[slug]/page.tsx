@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import BandPage from "@/components/band/BandPage";
 import { supabase } from "@/lib/supabase";
 import type { ProfileData } from "@/lib/bandProfile";
-import { BLANK_PROFILE } from "@/lib/bandProfile";
 
 export default function BandSlugPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +13,7 @@ export default function BandSlugPage() {
 
   useEffect(() => {
     if (!slug) return;
+    // Always fetch from Supabase — ensures any device gets the latest saved data
     supabase
       .from("bands")
       .select("profile")
@@ -30,10 +30,13 @@ export default function BandSlugPage() {
 
   if (notFound) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
         <p style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#555", fontSize: "0.9rem" }}>
           Band not found.
         </p>
+        <a href="/intake" style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#c8a86b", fontSize: "0.8rem", textDecoration: "none" }}>
+          Build your page →
+        </a>
       </div>
     );
   }
@@ -55,6 +58,7 @@ export default function BandSlugPage() {
       defaultProfile={profile}
       stagePlotHref={`/bandstack/${slug}/stage-plot`}
       defaultEditMode={true}
+      supabaseSlug={slug}
     />
   );
 }

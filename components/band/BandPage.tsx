@@ -5,6 +5,7 @@ import { useMobile } from "@/lib/useMobile";
 import { resolveTokens, applyMode } from "@/lib/genreTokens";
 import { type ProfileData } from "@/lib/bandProfile";
 import { supabase } from "@/lib/supabase";
+import { uploadBandImage } from "@/lib/storage";
 import Link from "next/link";
 
 import MusicSection      from "@/components/band/sections/MusicSection";
@@ -167,7 +168,14 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
           )}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.88) 100%)" }} />
           {editMode && (
-            <button onClick={() => { const url = prompt("Cover image URL:"); if (url?.trim()) onUpdate({ coverImage: url.trim() }); }} style={{ position: "absolute", top: 10, right: 10, background: tokens.accent, border: "none", borderRadius: 4, color: "#000", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>✎ Cover</button>
+            <label style={{ position: "absolute", top: 10, right: 10, background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
+              ✎ Cover
+              <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                const file = e.target.files?.[0]; if (!file || !supabaseSlug) return;
+                try { const url = await uploadBandImage(supabaseSlug, file, "cover"); onUpdate({ coverImage: url }); }
+                catch (err) { console.error("Cover upload failed:", err); }
+              }} />
+            </label>
           )}
         </div>
 
@@ -190,7 +198,14 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
                 }
               </div>
               {editMode && (
-                <button onClick={() => { const url = prompt("Profile photo URL:"); if (url?.trim()) onUpdate({ heroImage: url.trim() }); }} style={{ position: "absolute", bottom: 4, right: 4, background: tokens.accent, border: "none", borderRadius: 4, color: "#000", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>✎ Photo</button>
+                <label style={{ position: "absolute", bottom: 4, right: 4, background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
+                  ✎ Photo
+                  <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                    const file = e.target.files?.[0]; if (!file || !supabaseSlug) return;
+                    try { const url = await uploadBandImage(supabaseSlug, file, "profile"); onUpdate({ heroImage: url }); }
+                    catch (err) { console.error("Profile upload failed:", err); }
+                  }} />
+                </label>
               )}
             </div>
 
@@ -343,7 +358,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "history"    && <HistorySection    profile={profile} tokens={tokens} />}
       {active === "videos"     && <VideosSection     profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
-      {active === "photos"     && <PhotoSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
+      {active === "photos"     && <PhotoSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} supabaseSlug={supabaseSlug} />}
       {active === "gear"       && <GearSection       profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "timeline"   && <TimelineSection   profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}
       {active === "press"      && <PressSection      profile={profile} tokens={tokens} isArtist={editMode || defaultEditMode} onUpdate={onUpdate} />}

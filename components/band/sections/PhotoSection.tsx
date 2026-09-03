@@ -4,14 +4,15 @@ import { useState } from "react";
 import type { ProfileData } from "@/lib/bandProfile";
 import type { TokenSet } from "@/lib/genreTokens";
 import { useMobile } from "@/lib/useMobile";
+import { uploadBandImage } from "@/lib/storage";
 
 interface ProfilePhoto { url: string; label: string; }
 interface ProfilePoster { url: string; label: string; showDate?: string; venue?: string; }
-interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; }
+interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; supabaseSlug?: string; }
 
 type Tab = "photos" | "posters";
 
-export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Props) {
+export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supabaseSlug }: Props) {
   const isMobile = useMobile();
   const isLt = profile.colorMode === "light";
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
@@ -21,62 +22,60 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Pr
   const inp: React.CSSProperties = { background: isLt ? "#fff" : "#0e0e0e", border: `1px solid ${tokens.border}`, borderRadius: 4, color: tokens.text, padding: "6px 10px", fontSize: "0.8rem", fontFamily: "Inter, sans-serif", width: "100%", outline: "none" };
 
   const [tab, setTab] = useState<Tab>("photos");
-  const [adding, setAdding] = useState(false);
-  const [newUrl, setNewUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newDate, setNewDate] = useState("");
   const [newVenue, setNewVenue] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingPreview, setPendingPreview] = useState("");
 
   const photos: ProfilePhoto[] = profile.photos ?? [];
   const posters: ProfilePoster[] = profile.posters ?? [];
 
-  function resetForm() { setNewUrl(""); setNewLabel(""); setNewDate(""); setNewVenue(""); setAdding(false); }
-
-  function handleAddPhoto() {
-    if (!newUrl.trim()) return;
-    onUpdate?.({ photos: [...photos, { url: newUrl.trim(), label: newLabel.trim() || "Press Photo" }] });
-    resetForm();
+  function resetForm() {
+    setNewLabel(""); setNewDate(""); setNewVenue("");
+    setPendingFile(null); setPendingPreview("");
+    setUploading(false);
   }
 
-  function handleAddPoster() {
-    if (!newUrl.trim()) return;
-    onUpdate?.({ posters: [...posters, { url: newUrl.trim(), label: newLabel.trim() || "Show Poster", showDate: newDate.trim() || undefined, venue: newVenue.trim() || undefined }] });
-    resetForm();
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingFile(file);
+    setPendingPreview(URL.createObjectURL(file));
+  }
+
+  async function handleAddPhoto() {
+    if (!pendingFile) return;
+    setUploading(true);
+    try {
+      const folder = tab === "photos" ? "photos" : "posters";
+      const slug = supabaseSlug ?? "template";
+      const url = await uploadBandImage(slug, pendingFile, folder as "photos" | "posters");
+      if (tab === "photos") {
+        onUpdate?.({ photos: [...photos, { url, label: newLabel.trim() || "Press Photo" }] });
+      } else {
+        onUpdate?.({ posters: [...posters, { url, label: newLabel.trim() || "Show Poster", showDate: newDate.trim() || undefined, venue: newVenue.trim() || undefined }] });
+      }
+      resetForm();
+    } catch (err) {
+      console.error("Upload failed:", err);
+      setUploading(false);
+    }
   }
 
   function handleDeletePhoto(idx: number) { onUpdate?.({ photos: photos.filter((_, i) => i !== idx) }); }
   function handleDeletePoster(idx: number) { onUpdate?.({ posters: posters.filter((_, i) => i !== idx) }); }
 
   const tabBtn = (id: Tab, label: string) => (
-    <button onClick={() => { setTab(id); setAdding(false); }} style={{
+    <button onClick={() => { setTab(id); resetForm(); }} style={{
       ...lbl, background: tab === id ? (isLt ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.08)") : "transparent",
       color: tab === id ? (isLt ? "#000" : "#fff") : tokens.muted,
       border: "none", borderRadius: 4, padding: "5px 14px", cursor: "pointer",
     }}>{label}</button>
   );
 
-  const AddForm = ({ onSave, isPoster }: { onSave: () => void; isPoster: boolean }) => (
-    <div style={{ background: isLt ? "#f4f4f4" : "#111", border: `1px solid ${tokens.accent}44`, borderRadius: 8, padding: "1rem", marginBottom: "1.5rem" }}>
-      <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.6rem" }}>Add {isPoster ? "Show Poster" : "Press Photo"}</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "0.75rem" }}>
-        <input value={newUrl} onChange={e => setNewUrl(e.target.value)} placeholder="Image URL (https://...)" style={inp} autoFocus onKeyDown={e => { if (e.key === "Escape") resetForm(); }} />
-        <input value={newLabel} onChange={e => setNewLabel(e.target.value)} placeholder={isPoster ? "Label (e.g. Red Rocks 2025)" : "Label (e.g. Live at Gruene Hall)"} style={inp} />
-        {isPoster && <>
-          <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inp} />
-          <input value={newVenue} onChange={e => setNewVenue(e.target.value)} placeholder="Venue name" style={inp} />
-        </>}
-      </div>
-      {newUrl && (
-        <div style={{ marginBottom: "0.75rem", borderRadius: 6, overflow: "hidden", border: border2, width: isPoster ? 80 : 120, height: isPoster ? 112 : 90 }}>
-          <img src={newUrl} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
-        </div>
-      )}
-      <div style={{ display: "flex", gap: "0.5rem" }}>
-        <button onClick={onSave} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 14px", cursor: "pointer" }}>Add</button>
-        <button onClick={resetForm} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 14px", cursor: "pointer" }}>Cancel</button>
-      </div>
-    </div>
-  );
+  const isPoster = tab === "posters";
 
   return (
     <section id="photos" style={{ borderBottom: border1 }}>
@@ -90,19 +89,43 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Pr
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             {tab === "photos" && <p style={{ ...lbl, color: tokens.muted2 }}>Hi-res available on request</p>}
-            {isArtist && (
-              <button onClick={() => setAdding(a => !a)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "4px 10px", cursor: "pointer", ...T }}>
-                + Add {tab === "photos" ? "Photo" : "Poster"}
-              </button>
+            {isArtist && !pendingFile && (
+              <label style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "4px 10px", cursor: "pointer", ...T }}>
+                + {isPoster ? "Poster" : "Photo"}
+                <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
+              </label>
             )}
           </div>
         </div>
 
-        {/* Add form */}
-        {isArtist && adding && tab === "photos" && <AddForm onSave={handleAddPhoto} isPoster={false} />}
-        {isArtist && adding && tab === "posters" && <AddForm onSave={handleAddPoster} isPoster={true} />}
+        {/* Upload form — shown after file is chosen */}
+        {isArtist && pendingFile && (
+          <div style={{ background: isLt ? "#f4f4f4" : "#111", border: `1px solid ${tokens.accent}44`, borderRadius: 8, padding: "1rem", marginBottom: "1.5rem" }}>
+            <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.6rem" }}>
+              {isPoster ? "New Show Poster" : "New Press Photo"}
+            </p>
+            <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start", marginBottom: "0.75rem" }}>
+              <div style={{ borderRadius: 6, overflow: "hidden", border: border2, flexShrink: 0, width: isPoster ? 72 : 100, height: isPoster ? 102 : 75 }}>
+                <img src={pendingPreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              </div>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                <input value={newLabel} onChange={e => setNewLabel(e.target.value)} placeholder={isPoster ? "Label (e.g. Red Rocks 2025)" : "Label (e.g. Live at Gruene Hall)"} style={inp} />
+                {isPoster && <>
+                  <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} style={inp} />
+                  <input value={newVenue} onChange={e => setNewVenue(e.target.value)} placeholder="Venue name" style={inp} />
+                </>}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <button onClick={handleAddPhoto} disabled={uploading} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 14px", cursor: uploading ? "default" : "pointer", opacity: uploading ? 0.6 : 1 }}>
+                {uploading ? "Uploading…" : "Save"}
+              </button>
+              <button onClick={resetForm} disabled={uploading} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 14px", cursor: "pointer" }}>Cancel</button>
+            </div>
+          </div>
+        )}
 
-        {/* Press Photos grid — square */}
+        {/* Press Photos grid */}
         {tab === "photos" && (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem" }}>
@@ -123,7 +146,7 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Pr
                   </div>
                 </div>
               ))}
-              {photos.length === 0 && <p style={{ ...lbl, color: tokens.muted2 }}>No press photos yet.</p>}
+              {photos.length === 0 && <p style={{ ...lbl, color: tokens.muted2 }}>No press photos yet.{isArtist ? " Upload one above." : ""}</p>}
             </div>
             <p style={{ ...lbl, color: tokens.muted2, marginTop: "2rem" }}>
               For hi-res press photos contact{" "}
@@ -132,7 +155,7 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Pr
           </>
         )}
 
-        {/* Show Posters grid — portrait */}
+        {/* Show Posters grid */}
         {tab === "posters" && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "1rem" }}>
             {posters.map((poster, i) => (
@@ -154,7 +177,7 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate }: Pr
                 </div>
               </div>
             ))}
-            {posters.length === 0 && <p style={{ ...lbl, color: tokens.muted2 }}>No show posters yet.{isArtist ? " Add one above." : ""}</p>}
+            {posters.length === 0 && <p style={{ ...lbl, color: tokens.muted2 }}>No show posters yet.{isArtist ? " Upload one above." : ""}</p>}
           </div>
         )}
 

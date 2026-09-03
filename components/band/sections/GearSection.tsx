@@ -47,13 +47,9 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
 
   function commitAddCategory() {
     if (!newCategory.trim() || !activeMember) { setAddingCategory(false); return; }
-    const nextGear = [...gearData];
-    const mIdx = nextGear.findIndex(g => g.member === activeMember);
-    if (mIdx < 0) { setAddingCategory(false); return; }
-    nextGear[mIdx] = { ...nextGear[mIdx], gear: [...nextGear[mIdx].gear, { category: newCategory.trim(), name: "", detail: undefined }] };
-    onUpdate?.({ gear: nextGear });
+    const cat = newCategory.trim();
     setNewCategory(""); setAddingCategory(false);
-    setAdding({ category: newCategory.trim(), name: "", detail: "" });
+    setAdding({ category: cat, name: "", detail: "" });
   }
 
   function deleteMember(memberName: string) {
@@ -69,7 +65,7 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
     if (mIdx < 0) { setAdding(null); return; }
     nextGear[mIdx] = {
       ...nextGear[mIdx],
-      gear: [...nextGear[mIdx].gear, { category: adding.category, name: adding.name.trim(), detail: adding.detail.trim() || undefined }],
+      gear: [...nextGear[mIdx].gear.filter(g => g.name.trim()), { category: adding.category, name: adding.name.trim(), detail: adding.detail.trim() || undefined }],
     };
     onUpdate?.({ gear: nextGear });
     setAdding(null);
@@ -133,6 +129,20 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
         {memberData && (
           <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem" }}>
+            {/* New category card — shown when adding item for a category not yet in the grid */}
+            {adding && !categories.includes(adding.category) && (
+              <div style={{ background: isLt ? "#f4f4f4" : "#111", border: `1px solid ${tokens.accent}44`, borderRadius: 8, padding: "16px 18px" }}>
+                <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.6rem" }}>{adding.category}</p>
+                <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                  <input autoFocus value={adding.name} onChange={e => setAdding({ ...adding, name: e.target.value })} placeholder="Gear name" style={inputStyle} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") setAdding(null); }} />
+                  <input value={adding.detail} onChange={e => setAdding({ ...adding, detail: e.target.value })} placeholder="Detail (optional)" style={inputStyle} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") setAdding(null); }} />
+                  <div style={{ display: "flex", gap: "0.4rem" }}>
+                    <button onClick={commitAdd} style={{ ...lbl, flex: 1, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 0", cursor: "pointer" }}>Add</button>
+                    <button onClick={() => setAdding(null)} style={{ ...lbl, flex: 1, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 0", cursor: "pointer" }}>Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )}
             {categories.map(cat => {
               const items = memberData.gear.filter(g => g.category === cat);
               const isAddingHere = adding?.category === cat;

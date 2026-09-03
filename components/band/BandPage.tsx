@@ -168,14 +168,19 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
           )}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.88) 100%)" }} />
           {editMode && (
-            <label style={{ position: "absolute", top: 10, right: 10, background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
-              ✎ Cover
-              <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
-                const file = e.target.files?.[0]; if (!file || !supabaseSlug) return;
-                try { const url = await uploadBandImage(supabaseSlug, file, "cover"); onUpdate({ coverImage: url }); }
-                catch (err) { console.error("Cover upload failed:", err); }
-              }} />
-            </label>
+            <div style={{ position: "absolute", top: 10, right: 10, display: "flex", gap: 4 }}>
+              {profile.coverImage && (
+                <button onClick={() => onUpdate({ coverImage: "" })} style={{ background: "rgba(0,0,0,0.6)", border: "none", borderRadius: 4, color: "#d95c5c", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif" }}>✕</button>
+              )}
+              <label style={{ background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.6rem", fontWeight: 700, padding: "4px 8px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
+                ✎ Cover
+                <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                  const file = e.target.files?.[0]; if (!file || !supabaseSlug) return;
+                  try { const url = await uploadBandImage(supabaseSlug, file, "cover"); onUpdate({ coverImage: url }); }
+                  catch (err) { console.error("Cover upload failed:", err); }
+                }} />
+              </label>
+            </div>
           )}
         </div>
 
@@ -198,7 +203,11 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
                 }
               </div>
               {editMode && (
-                <label style={{ position: "absolute", bottom: 4, right: 4, background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
+                <div style={{ position: "absolute", bottom: 4, right: 4, display: "flex", gap: 3 }}>
+                  {profile.heroImage && (
+                    <button onClick={() => onUpdate({ heroImage: "" })} style={{ background: "rgba(0,0,0,0.6)", border: "none", borderRadius: 4, color: "#d95c5c", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif" }}>✕</button>
+                  )}
+                <label style={{ background: tokens.accent, borderRadius: 4, color: "#000", fontSize: "0.55rem", fontWeight: 700, padding: "3px 6px", cursor: "pointer", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.06em" }}>
                   ✎ Photo
                   <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
                     const file = e.target.files?.[0]; if (!file || !supabaseSlug) return;
@@ -206,6 +215,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
                     catch (err) { console.error("Profile upload failed:", err); }
                   }} />
                 </label>
+                </div>
               )}
             </div>
 

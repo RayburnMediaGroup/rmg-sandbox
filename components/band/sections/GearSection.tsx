@@ -99,19 +99,27 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
               )}
             </div>
           ))}
-          {isArtist && !addingMember && (
-            <button onClick={() => setAddingMember(true)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "5px 12px", cursor: "pointer", ...T }}>
-              + Member
-            </button>
-          )}
-          {isArtist && addingMember && (
-            <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
-              <input autoFocus value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Name" onKeyDown={e => { if (e.key === "Enter") commitAddMember(); if (e.key === "Escape") setAddingMember(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 120 }} />
-              <input value={newMemberRole} onChange={e => setNewMemberRole(e.target.value)} placeholder="Role (e.g. Guitar)" onKeyDown={e => { if (e.key === "Enter") commitAddMember(); if (e.key === "Escape") setAddingMember(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 140 }} />
-              <button onClick={commitAddMember} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 12px", cursor: "pointer" }}>Add</button>
-              <button onClick={() => setAddingMember(false)} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 10px", cursor: "pointer" }}>Cancel</button>
-            </div>
-          )}
+          {isArtist && (() => {
+            const existing = (profile.members ?? []).filter(m => m.name.trim() && !gearData.find(g => g.member === m.name));
+            return !addingMember ? (
+              <button onClick={() => setAddingMember(true)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "5px 12px", cursor: "pointer", ...T }}>
+                + Member
+              </button>
+            ) : (
+              <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
+                {existing.length > 0 ? (
+                  <select autoFocus value={newMemberName} onChange={e => { const m = (profile.members ?? []).find(x => x.name === e.target.value); setNewMemberName(e.target.value); setNewMemberRole(m?.role ?? ""); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none" }}>
+                    <option value="">Select member…</option>
+                    {existing.map(m => <option key={m.name} value={m.name}>{m.name}{m.role ? ` — ${m.role}` : ""}</option>)}
+                  </select>
+                ) : (
+                  <input autoFocus value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Name" onKeyDown={e => { if (e.key === "Enter") commitAddMember(); if (e.key === "Escape") setAddingMember(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 120 }} />
+                )}
+                <button onClick={commitAddMember} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 12px", cursor: "pointer" }}>Add</button>
+                <button onClick={() => { setAddingMember(false); setNewMemberName(""); setNewMemberRole(""); }} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 10px", cursor: "pointer" }}>Cancel</button>
+              </div>
+            );
+          })()}
         </div>
 
         {gearData.length === 0 && (

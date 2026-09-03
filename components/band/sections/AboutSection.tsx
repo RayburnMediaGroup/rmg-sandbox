@@ -73,10 +73,7 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
     <section id="about" style={{ borderBottom: border1 }}>
       <div style={{ maxWidth: 860, margin: "0 auto", padding: isMobile ? "32px 16px" : "48px 40px" }}>
 
-        {isArtist
-          ? <EditField value={(profile as any).sectionLabelAbout ?? "About"} onSave={v => onUpdate?.({ sectionLabelAbout: v } as any)} accentColor={tokens.accent} style={{ display: "block", marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1, fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: tokens.accent, fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }} />
-          : <p className="section-label" style={{ marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1 }}>About</p>
-        }
+        <p style={{ display: "block", marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1, fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: tokens.accent, fontWeight: 600, fontFamily: "Inter, system-ui, sans-serif" }}>About</p>
 
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", gap: isMobile ? "2rem" : "3.5rem", alignItems: "start" }}>
 
@@ -108,12 +105,9 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
               }
             </div>
 
-            {/* Press — heading ALWAYS renders */}
+            {/* Press */}
             <div style={{ marginBottom: "2.5rem" }}>
-              {isArtist
-                ? <EditField value={(profile as any).sectionLabelPress ?? "Press"} onSave={v => onUpdate?.({ sectionLabelPress: v } as any)} accentColor={tokens.accent} style={{ ...sHead, display: "block" }} />
-                : <p className="section-label" style={{ marginBottom: "0.75rem", paddingBottom: "0.5rem", borderBottom: border1 }}>Press</p>
-              }
+              <p style={{ ...sHead, color: tokens.accent, display: "block", marginBottom: "0.75rem", paddingBottom: "0.5rem", borderBottom: border1 }}>Press</p>
               {(profile.pressQuotes ?? []).map((q, i) => (
                 <div key={i} style={{ marginBottom: "1.5rem", position: "relative" }}>
                   {isArtist

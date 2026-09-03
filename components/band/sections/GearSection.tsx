@@ -20,6 +20,11 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
   const gearData = profile.gear ?? [];
   const [activeMember, setActiveMember] = useState(gearData[0]?.member ?? "");
   const [adding, setAdding] = useState<AddState | null>(null);
+  const [addingMember, setAddingMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("");
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   const memberData = gearData.find(g => g.member === activeMember);
   const categories = memberData ? [...new Set(memberData.gear.map(g => g.category))] : [];
@@ -30,6 +35,32 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
     border: border1, borderRadius: 4, padding: "5px 8px",
     outline: "none", width: "100%",
   };
+
+  function commitAddMember() {
+    if (!newMemberName.trim()) { setAddingMember(false); return; }
+    const newEntry = { member: newMemberName.trim(), role: newMemberRole.trim() || "", gear: [] };
+    const nextGear = [...gearData, newEntry];
+    onUpdate?.({ gear: nextGear });
+    setActiveMember(newMemberName.trim());
+    setNewMemberName(""); setNewMemberRole(""); setAddingMember(false);
+  }
+
+  function commitAddCategory() {
+    if (!newCategory.trim() || !activeMember) { setAddingCategory(false); return; }
+    const nextGear = [...gearData];
+    const mIdx = nextGear.findIndex(g => g.member === activeMember);
+    if (mIdx < 0) { setAddingCategory(false); return; }
+    nextGear[mIdx] = { ...nextGear[mIdx], gear: [...nextGear[mIdx].gear, { category: newCategory.trim(), name: "", detail: undefined }] };
+    onUpdate?.({ gear: nextGear });
+    setNewCategory(""); setAddingCategory(false);
+    setAdding({ category: newCategory.trim(), name: "", detail: "" });
+  }
+
+  function deleteMember(memberName: string) {
+    const nextGear = gearData.filter(g => g.member !== memberName);
+    onUpdate?.({ gear: nextGear });
+    setActiveMember(nextGear[0]?.member ?? "");
+  }
 
   function commitAdd() {
     if (!adding?.name.trim()) { setAdding(null); return; }
@@ -51,29 +82,48 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
         <p className="section-label" style={{ marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1 }}>Gear List</p>
 
         {/* Member tabs */}
-        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "2rem" }}>
+        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "2rem", alignItems: "center" }}>
           {gearData.map(g => (
-            <button key={g.member} onClick={() => setActiveMember(g.member)} style={{
-              ...T, fontSize: "0.75rem", fontWeight: 400,
-              color: activeMember === g.member ? (isLt ? "#000" : "#fff") : tokens.muted,
-              background: activeMember === g.member ? (isLt ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)") : "transparent",
-              border: border1, borderRadius: 4, padding: "6px 14px", cursor: "pointer",
-            }}>
-              {g.member}
-              <span style={{ ...lbl, marginLeft: "0.4rem", fontSize: "0.5rem" }}>{g.role}</span>
-            </button>
+            <div key={g.member} style={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <button onClick={() => setActiveMember(g.member)} style={{
+                ...T, fontSize: "0.75rem", fontWeight: 400,
+                color: activeMember === g.member ? (isLt ? "#000" : "#fff") : tokens.muted,
+                background: activeMember === g.member ? (isLt ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.07)") : "transparent",
+                border: border1, borderRadius: 4, padding: "6px 14px", cursor: "pointer",
+              }}>
+                {g.member}
+                <span style={{ ...lbl, marginLeft: "0.4rem", fontSize: "0.5rem" }}>{g.role}</span>
+              </button>
+              {isArtist && activeMember === g.member && (
+                <button onClick={() => deleteMember(g.member)} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.6rem", padding: "2px 4px", ...T }}>✕</button>
+              )}
+            </div>
           ))}
+          {isArtist && !addingMember && (
+            <button onClick={() => setAddingMember(true)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "5px 12px", cursor: "pointer", ...T }}>
+              + Member
+            </button>
+          )}
+          {isArtist && addingMember && (
+            <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
+              <input autoFocus value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Name" onKeyDown={e => { if (e.key === "Enter") commitAddMember(); if (e.key === "Escape") setAddingMember(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 120 }} />
+              <input value={newMemberRole} onChange={e => setNewMemberRole(e.target.value)} placeholder="Role (e.g. Guitar)" onKeyDown={e => { if (e.key === "Enter") commitAddMember(); if (e.key === "Escape") setAddingMember(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 140 }} />
+              <button onClick={commitAddMember} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 12px", cursor: "pointer" }}>Add</button>
+              <button onClick={() => setAddingMember(false)} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 10px", cursor: "pointer" }}>Cancel</button>
+            </div>
+          )}
         </div>
 
         {gearData.length === 0 && (
           <p style={{ ...T, fontSize: "0.85rem", color: tokens.muted2, fontWeight: 300 }}>
             {isArtist
-              ? "No gear list yet. Gear is organized by band member — add member gear data to get started."
+              ? "No gear list yet — click + Member above to get started."
               : "No gear list available."}
           </p>
         )}
 
         {memberData && (
+          <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "1.5rem" }}>
             {categories.map(cat => {
               const items = memberData.gear.filter(g => g.category === cat);
@@ -171,6 +221,24 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
                 </div>
               );
             })}
+          </div>
+
+          {/* Add category */}
+          {isArtist && (
+            <div style={{ marginTop: "1.5rem" }}>
+              {addingCategory ? (
+                <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                  <input autoFocus value={newCategory} onChange={e => setNewCategory(e.target.value)} placeholder="Category (e.g. Guitars, Amps, Pedals)" onKeyDown={e => { if (e.key === "Enter") commitAddCategory(); if (e.key === "Escape") setAddingCategory(false); }} style={{ ...T, fontSize: "0.78rem", color: tokens.text, background: isLt ? "#fff" : "#0e0e0e", border: border1, borderRadius: 4, padding: "5px 8px", outline: "none", width: 220 }} />
+                  <button onClick={commitAddCategory} style={{ ...lbl, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 12px", cursor: "pointer" }}>Add</button>
+                  <button onClick={() => setAddingCategory(false)} style={{ ...lbl, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 10px", cursor: "pointer" }}>Cancel</button>
+                </div>
+              ) : (
+                <button onClick={() => setAddingCategory(true)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "5px 12px", cursor: "pointer", ...T }}>
+                  + Add Category
+                </button>
+              )}
+            </div>
+          )}
           </div>
         )}
       </div>

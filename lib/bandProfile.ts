@@ -72,7 +72,7 @@ export interface ProfileData {
   shows: ProfileShow[];
   bookingEmail: string; bookingContact?: string;
   instagram: string; spotify: string; appleMusic: string;
-  youtube?: string; facebook?: string; tiktok?: string;
+  youtube?: string; facebook?: string; tiktok?: string; twitter?: string;
   heroImage: string; coverImage?: string; albumArt: string;
   colorMode: "dark" | "light";
   merchUrl?: string;

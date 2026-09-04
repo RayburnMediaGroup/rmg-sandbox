@@ -73,6 +73,8 @@ export interface ProfileData {
   bookingEmail: string; bookingContact?: string;
   instagram: string; spotify: string; appleMusic: string;
   youtube?: string; facebook?: string; tiktok?: string; twitter?: string;
+  website?: string; epk?: string; merch?: string; label?: string;
+  managerName?: string; managerEmail?: string; agentName?: string; agentEmail?: string;
   heroImage: string; coverImage?: string; albumArt: string;
   colorMode: "dark" | "light";
   merchUrl?: string;

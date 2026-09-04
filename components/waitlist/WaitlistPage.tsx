@@ -79,13 +79,13 @@ export default function WaitlistPage() {
         <style>{`@keyframes breathe { 0%,100%{transform:scale(1);opacity:0.5} 50%{transform:scale(1.6);opacity:1} }`}</style>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#d8d8d8", marginBottom: "2.5rem", animation: "breathe 2.8s ease-in-out infinite" }} />
         <p style={{ ...T, fontSize: "2.2rem", color: "#d8d8d8", fontWeight: 300, marginBottom: "0.75rem", letterSpacing: "0.01em" }}>
-          check your inbox.
+          you&apos;re on the list.
         </p>
         <p style={{ ...T, fontSize: "1.1rem", color: "#888", fontWeight: 300, textAlign: "center", lineHeight: 1.9, maxWidth: 400 }}>
-          we sent a confirmation link to<br />
+          your spot is reserved for<br />
           <span style={{ color: "#d8d8d8" }}>{email}</span>
           <br /><br />
-          click it to confirm your spot. we&apos;ll be in touch.
+          we&apos;ll be in touch when access opens.
         </p>
         <p style={{
           fontFamily: "'Playfair Display', Georgia, serif",

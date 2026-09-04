@@ -1,10 +1,9 @@
-import IntakeForm from "@/components/intake/IntakeForm";
+import GatedIntake from "@/components/waitlist/GatedIntake";
 
 export const metadata = {
-  title: "BandStack Intake — Build Your Site",
-  description: "Tell us about your band. We'll generate your site.",
+  title: "bandwidth — artist intake",
 };
 
 export default function IntakePage() {
-  return <IntakeForm />;
+  return <GatedIntake />;
 }

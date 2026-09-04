@@ -19,12 +19,30 @@ interface FormState {
   members: MemberEntry[];
   bookingContact: string;
   bookingEmail: string;
+  managerName: string;
+  managerEmail: string;
+  agentName: string;
+  agentEmail: string;
+  label: string;
+  website: string;
+  epk: string;
+  merch: string;
+  // Streaming
   spotify: string;
   appleMusic: string;
+  soundcloud: string;
+  bandcamp: string;
+  tidal: string;
+  amazonMusic: string;
+  // Video
   youtube: string;
+  vimeo: string;
+  // Social
   instagram: string;
   facebook: string;
   tiktok: string;
+  twitter: string;
+  threads: string;
 }
 
 const BLANK: FormState = {
@@ -32,8 +50,12 @@ const BLANK: FormState = {
   tagline: "", bio: "",
   members: [{ name: "", role: "" }],
   bookingContact: "", bookingEmail: "",
-  spotify: "", appleMusic: "", youtube: "",
-  instagram: "", facebook: "", tiktok: "",
+  managerName: "", managerEmail: "",
+  agentName: "", agentEmail: "",
+  label: "", website: "", epk: "", merch: "",
+  spotify: "", appleMusic: "", soundcloud: "", bandcamp: "", tidal: "", amazonMusic: "",
+  youtube: "", vimeo: "",
+  instagram: "", facebook: "", tiktok: "", twitter: "", threads: "",
 };
 
 const GENRES = ["Americana", "Rock", "Country", "Folk", "Blues", "R&B", "Pop", "Hip-Hop", "Jazz", "Electronic", "Metal", "Indie", "Soul", "Punk", "Classical", "Other"];
@@ -44,33 +66,37 @@ const DATA_VERSION = "v5";
 // ─── Styles ────────────────────────────────────────────────────────
 
 const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
+const GOLD = "#d4a843";
+const GOLD_DIM = "#a07c28";
+const GOLD_LINE = "rgba(212,168,67,0.55)";
 
 const inputStyle: React.CSSProperties = {
-  ...T, width: "100%", background: "#0e0e0e",
-  border: "1px solid #2e2e2e", borderRadius: 6,
-  color: "#d8d8d8", padding: "12px 16px",
+  ...T, width: "100%", background: "transparent",
+  border: "none", borderBottom: `1px solid ${GOLD_LINE}`,
+  color: "#d8d8d8", padding: "12px 0",
   fontSize: "0.95rem", outline: "none",
+  letterSpacing: "0.01em",
   transition: "border-color 0.15s",
 };
 
 const labelStyle: React.CSSProperties = {
-  ...T, fontSize: "0.6rem", letterSpacing: "0.14em",
-  textTransform: "uppercase", color: "#555", fontWeight: 500,
-  display: "block", marginBottom: "0.4rem",
+  ...T, fontSize: "0.58rem", letterSpacing: "0.16em",
+  textTransform: "uppercase", color: GOLD_DIM, fontWeight: 500,
+  display: "block", marginBottom: "0",
 };
 
 const sectionHead: React.CSSProperties = {
-  ...T, fontSize: "1.1rem", fontWeight: 400, color: "#d8d8d8",
-  marginBottom: "0.25rem",
+  ...T, fontSize: "1.5rem", fontWeight: 300, color: "#d8d8d8",
+  marginBottom: "0.35rem",
 };
 
 const sectionSub: React.CSSProperties = {
-  ...T, fontSize: "0.82rem", color: "#555", fontWeight: 300,
-  marginBottom: "1.5rem", lineHeight: 1.6,
+  ...T, fontSize: "0.85rem", color: "#888", fontWeight: 300,
+  marginBottom: "2rem", lineHeight: 1.6,
 };
 
 const divider: React.CSSProperties = {
-  border: "none", borderTop: "1px solid #1e1e1e", margin: "2rem 0",
+  border: "none", borderTop: `1px solid ${GOLD_LINE}`, margin: "2rem 0", opacity: 0.4,
 };
 
 // ─── Field components ──────────────────────────────────────────────
@@ -177,6 +203,15 @@ export default function IntakeForm() {
       youtube: f.youtube.trim(),
       facebook: f.facebook.trim(),
       tiktok: f.tiktok.trim(),
+      twitter: f.twitter.trim(),
+      website: f.website.trim(),
+      epk: f.epk.trim(),
+      merch: f.merch.trim(),
+      label: f.label.trim(),
+      managerName: f.managerName.trim(),
+      managerEmail: f.managerEmail.trim(),
+      agentName: f.agentName.trim(),
+      agentEmail: f.agentEmail.trim(),
       heroImage: "",
       coverImage: "",
       albumArt: "",
@@ -191,12 +226,22 @@ export default function IntakeForm() {
 
   function buildLinks(f: FormState) {
     const links = [];
+    if (f.website) links.push({ label: "Website", url: f.website, category: "Web" as const });
+    if (f.epk) links.push({ label: "EPK", url: f.epk, category: "Web" as const });
+    if (f.merch) links.push({ label: "Merch", url: f.merch, category: "Web" as const });
     if (f.spotify) links.push({ label: "Spotify", url: f.spotify, category: "Streaming" as const });
     if (f.appleMusic) links.push({ label: "Apple Music", url: f.appleMusic, category: "Streaming" as const });
+    if (f.soundcloud) links.push({ label: "SoundCloud", url: f.soundcloud, category: "Streaming" as const });
+    if (f.bandcamp) links.push({ label: "Bandcamp", url: f.bandcamp, category: "Streaming" as const });
+    if (f.tidal) links.push({ label: "Tidal", url: f.tidal, category: "Streaming" as const });
+    if (f.amazonMusic) links.push({ label: "Amazon Music", url: f.amazonMusic, category: "Streaming" as const });
     if (f.youtube) links.push({ label: "YouTube", url: f.youtube, category: "Video" as const });
+    if (f.vimeo) links.push({ label: "Vimeo", url: f.vimeo, category: "Video" as const });
     if (f.instagram) links.push({ label: "Instagram", url: f.instagram, category: "Social" as const });
     if (f.facebook) links.push({ label: "Facebook", url: f.facebook, category: "Social" as const });
     if (f.tiktok) links.push({ label: "TikTok", url: f.tiktok, category: "Social" as const });
+    if (f.twitter) links.push({ label: "X / Twitter", url: f.twitter, category: "Social" as const });
+    if (f.threads) links.push({ label: "Threads", url: f.threads, category: "Social" as const });
     return links;
   }
 
@@ -248,21 +293,24 @@ export default function IntakeForm() {
     );
   }
 
-  const accent = "#c8a86b";
+  const accent = GOLD;
 
   const btnPrimary: React.CSSProperties = {
-    ...T, background: accent, color: "#0a0a0a", border: "none",
-    borderRadius: 6, padding: "12px 28px", fontSize: "0.82rem",
-    fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+    ...T, background: canAdvance() ? GOLD : "transparent",
+    color: canAdvance() ? "#080808" : GOLD_DIM,
+    border: `1px solid ${canAdvance() ? GOLD : GOLD_LINE}`,
+    borderRadius: 4, padding: "13px 28px", fontSize: "0.72rem",
+    fontWeight: 500, letterSpacing: "0.14em", textTransform: "uppercase",
     cursor: canAdvance() ? "pointer" : "not-allowed",
-    opacity: canAdvance() ? 1 : 0.35,
-    transition: "opacity 0.15s",
+    transition: "all 0.2s",
   };
 
   const btnSecondary: React.CSSProperties = {
-    ...T, background: "transparent", color: "#555", border: "1px solid #2e2e2e",
-    borderRadius: 6, padding: "12px 28px", fontSize: "0.82rem",
-    fontWeight: 400, letterSpacing: "0.04em", cursor: "pointer",
+    ...T, background: "transparent", color: "#888",
+    border: `1px solid rgba(255,255,255,0.12)`,
+    borderRadius: 4, padding: "13px 28px", fontSize: "0.72rem",
+    fontWeight: 400, letterSpacing: "0.08em", textTransform: "uppercase",
+    cursor: "pointer", transition: "all 0.2s",
   };
 
   // ── Step content ──────────────────────────────────────────────────
@@ -278,7 +326,7 @@ export default function IntakeForm() {
               <Input value={f.name} onChange={v => set("name", v)} placeholder="e.g. Ryan Chrys & The Rough Cuts" />
             </Field>
             <Field label="Genre *">
-              <select value={f.genre} onChange={e => set("genre", e.target.value)} style={{ ...inputStyle, cursor: "pointer" }}>
+              <select value={f.genre} onChange={e => set("genre", e.target.value)} style={{ ...inputStyle, cursor: "pointer", appearance: "none", WebkitAppearance: "none" }}>
                 {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </Field>
@@ -322,10 +370,10 @@ export default function IntakeForm() {
                   placeholder="Role (e.g. Guitar)"
                   style={inputStyle}
                 />
-                <button onClick={() => removeMember(i)} style={{ ...T, background: "transparent", border: "none", color: "#555", cursor: "pointer", fontSize: "1rem", padding: "0 4px" }}>✕</button>
+                <button onClick={() => removeMember(i)} style={{ ...T, background: "transparent", border: "none", color: "#888", cursor: "pointer", fontSize: "1rem", padding: "0 4px" }}>✕</button>
               </div>
             ))}
-            <button onClick={addMember} style={{ ...T, background: "transparent", border: "1px dashed #2e2e2e", borderRadius: 6, color: accent, padding: "10px 20px", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "0.06em" }}>
+            <button onClick={addMember} style={{ ...T, background: "transparent", border: `1px dashed ${GOLD_LINE}`, borderRadius: 4, color: GOLD_DIM, padding: "10px 20px", fontSize: "0.8rem", cursor: "pointer", letterSpacing: "0.06em" }}>
               + Add Member
             </button>
           </>
@@ -347,17 +395,24 @@ export default function IntakeForm() {
         return (
           <>
             <p style={sectionHead}>Where do fans find you?</p>
-            <p style={sectionSub}>Add what you have — everything is optional and editable later.</p>
+            <p style={sectionSub}>Add everything — all optional, editable later. More data means better discovery.</p>
+
+            <p style={{ ...T, fontSize: "0.58rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#888", marginBottom: "1rem" }}>Web</p>
+            <Field label="Official Website"><Input value={f.website} onChange={v => set("website", v)} placeholder="https://yourband.com" /></Field>
+
             <hr style={divider} />
-            <p style={{ ...T, fontSize: "0.6rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#555", marginBottom: "1rem" }}>Streaming</p>
+            <p style={{ ...T, fontSize: "0.58rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#888", marginBottom: "1rem" }}>Streaming</p>
             <Field label="Spotify"><Input value={f.spotify} onChange={v => set("spotify", v)} placeholder="https://open.spotify.com/artist/…" /></Field>
             <Field label="Apple Music"><Input value={f.appleMusic} onChange={v => set("appleMusic", v)} placeholder="https://music.apple.com/…" /></Field>
+            <Field label="SoundCloud"><Input value={f.soundcloud} onChange={v => set("soundcloud", v)} placeholder="https://soundcloud.com/…" /></Field>
+            <Field label="Bandcamp"><Input value={f.bandcamp} onChange={v => set("bandcamp", v)} placeholder="https://yourband.bandcamp.com" /></Field>
             <hr style={divider} />
-            <p style={{ ...T, fontSize: "0.6rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#555", marginBottom: "1rem" }}>Social</p>
-            <Field label="YouTube"><Input value={f.youtube} onChange={v => set("youtube", v)} placeholder="https://youtube.com/@…" /></Field>
-            <Field label="Instagram"><Input value={f.instagram} onChange={v => set("instagram", v)} placeholder="https://instagram.com/…" /></Field>
+            <p style={{ ...T, fontSize: "0.58rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "#888", marginBottom: "1rem" }}>Social</p>
             <Field label="Facebook"><Input value={f.facebook} onChange={v => set("facebook", v)} placeholder="https://facebook.com/…" /></Field>
+            <Field label="Instagram"><Input value={f.instagram} onChange={v => set("instagram", v)} placeholder="https://instagram.com/…" /></Field>
             <Field label="TikTok"><Input value={f.tiktok} onChange={v => set("tiktok", v)} placeholder="https://tiktok.com/@…" /></Field>
+            <Field label="YouTube"><Input value={f.youtube} onChange={v => set("youtube", v)} placeholder="https://youtube.com/@…" /></Field>
+            <Field label="X / Twitter"><Input value={f.twitter} onChange={v => set("twitter", v)} placeholder="https://x.com/…" /></Field>
           </>
         );
       default:
@@ -368,28 +423,43 @@ export default function IntakeForm() {
   const isLast = step === STEPS.length - 1;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", flexDirection: "column" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "#080808",
+      backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.86) 40%, rgba(8,8,8,0.92) 100%), url('/red-rocks-hero.jpg')",
+      backgroundSize: "cover",
+      backgroundPosition: "center 30%",
+      backgroundAttachment: "fixed",
+      display: "flex",
+      flexDirection: "column",
+    }}>
       <style>{`
         * { box-sizing: border-box; }
         input, textarea, select { font-family: Inter, system-ui, sans-serif; }
-        input:focus, textarea:focus, select:focus { border-color: ${accent} !important; }
-        input::placeholder, textarea::placeholder { color: #333; }
+        input:focus, textarea:focus, select:focus { border-bottom-color: ${GOLD} !important; }
+        input::placeholder, textarea::placeholder { color: #666; }
+        select option { background: #161616; color: #d8d8d8; }
         @keyframes breathe { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.5);opacity:1} }
       `}</style>
 
       {/* Progress bar */}
-      <div style={{ height: 2, background: "#1a1a1a", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
-        <div style={{ height: "100%", background: accent, width: `${((step + 1) / STEPS.length) * 100}%`, transition: "width 0.3s ease" }} />
+      <div style={{ height: 2, background: "rgba(255,255,255,0.08)", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
+        <div style={{ height: "100%", background: GOLD, width: `${((step + 1) / STEPS.length) * 100}%`, transition: "width 0.3s ease" }} />
       </div>
 
       {/* Header */}
-      <div style={{ padding: "2rem 2rem 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <p style={{ ...T, fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#333", fontWeight: 400 }}>
-          BandStack
+      <div style={{ padding: "2rem 2.5rem 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <p style={{
+          fontFamily: "'Playfair Display', Georgia, serif",
+          fontStyle: "italic", fontWeight: 400,
+          fontSize: "1.3rem", color: "#d8d8d8",
+          letterSpacing: "0.04em", margin: 0,
+        }}>
+          bandwidth
         </p>
-        <div style={{ display: "flex", gap: "0.35rem" }}>
+        <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
           {STEPS.map((s, i) => (
-            <div key={s.id} style={{ width: 6, height: 6, borderRadius: "50%", background: i <= step ? accent : "#1e1e1e", transition: "background 0.2s" }} />
+            <div key={s.id} style={{ width: 6, height: 6, borderRadius: "50%", background: i <= step ? GOLD : "rgba(255,255,255,0.2)", transition: "background 0.2s" }} />
           ))}
         </div>
       </div>
@@ -399,7 +469,7 @@ export default function IntakeForm() {
         <div style={{ width: "100%", maxWidth: 560 }}>
 
           {/* Step label */}
-          <p style={{ ...T, fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: accent, marginBottom: "1.5rem", fontWeight: 500 }}>
+          <p style={{ ...T, fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1.5rem", fontWeight: 500 }}>
             {step + 1} / {STEPS.length} · {STEPS[step].label}
           </p>
 

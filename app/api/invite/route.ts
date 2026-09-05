@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
             <a href="${loginUrl}" style="display:inline-block;background:#d4a843;color:#080808;text-decoration:none;padding:14px 36px;border-radius:4px;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;">
               sign in
             </a>
-            <p style="font-size:12px;color:#444;margin:48px 0 0;">© 2026 bandwidth · by rayburn media</p>
+            <p style="font-size:12px;color:#666;margin:48px 0 0;">© 2026 bandwidth · by rayburn media</p>
           </div>
         </div>
       `,

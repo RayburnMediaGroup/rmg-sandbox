@@ -96,7 +96,7 @@ export default function WaitlistPage() {
           fontStyle: "italic",
           fontWeight: 400,
           fontSize: "1.4rem",
-          color: "#444",
+          color: "#666",
           marginTop: "3.5rem",
           letterSpacing: "0.04em",
         }}>

@@ -139,7 +139,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
               {refVisits} / 10 referrals
             </span>
           </div>
-          <p style={{ ...lbl, color: "#444", marginBottom: "0.75rem", textTransform: "none", letterSpacing: 0, fontSize: "0.65rem", lineHeight: 1.6 }}>
+          <p style={{ ...lbl, color: "#666", marginBottom: "0.75rem", textTransform: "none", letterSpacing: 0, fontSize: "0.65rem", lineHeight: 1.6 }}>
             Refer 10 clients → your first year free + gold badge on your profile.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -173,7 +173,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
                       <p style={{ ...T, fontSize: "0.8rem", color: "#d8d8d8", fontWeight: 500 }}>{link.label}</p>
                       <p style={{ ...lbl, marginTop: "0.05rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{link.desc}</p>
                     </div>
-                    <span style={{ color: "#444", fontSize: "0.7rem", flexShrink: 0 }}>↗</span>
+                    <span style={{ color: "#666", fontSize: "0.7rem", flexShrink: 0 }}>↗</span>
                   </a>
                 ))}
               </div>

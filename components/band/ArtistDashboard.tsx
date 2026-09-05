@@ -55,7 +55,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
   const [copied, setCopied] = useState(false);
 
   const refCode = bandName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  const refUrl = `https://bandstack.io/band?ref=${refCode}`;
+  const refUrl = `https://bandstack-template.vercel.app/?ref=${refCode}`;
 
   useEffect(() => {
     try {
@@ -183,7 +183,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
 
         {/* Footer */}
         <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid #1e1e1e" }}>
-          <p style={{ ...lbl, textAlign: "center" }}>BandStack · Artist Portal · Private</p>
+          <p style={{ ...lbl, textAlign: "center" }}>bandwidth · artist portal · private</p>
         </div>
       </div>
     </>

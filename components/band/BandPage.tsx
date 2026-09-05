@@ -313,7 +313,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
           <button
             onClick={async () => {
               const url = window.location.href;
-              const title = profile.name ?? "BandStack";
+              const title = profile.name ?? "bandwidth";
               if (navigator.share) {
                 try { await navigator.share({ title, url }); } catch {}
               } else {
@@ -429,7 +429,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {/* Footer */}
       <footer style={{ padding: "20px 40px", borderTop: `1px solid ${tokens.border}`, display: "flex", justifyContent: "space-between" }}>
         <p style={{ ...lbl, color: tokens.muted2 }}>{profile.name}{profile.founded ? ` · Est. ${profile.founded}` : ""}</p>
-        <p style={{ ...lbl, color: tokens.muted2 }}>BandStack · Powered by Rayburn Media Group</p>
+        <p style={{ ...lbl, color: tokens.muted2 }}>bandwidth · powered by RMG</p>
       </footer>
     </main>
   );

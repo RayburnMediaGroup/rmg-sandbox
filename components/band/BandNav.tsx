@@ -42,7 +42,7 @@ export default function BandNav({ profile, tokens, activeSection }: BandNavProps
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         style={{ ...T, fontWeight: 700, fontSize: "0.9rem", color: tokens.text, cursor: "pointer", letterSpacing: "-0.01em", flexShrink: 0 }}
       >
-        {profile.name || "BandStack"}
+        {profile.name || "bandwidth"}
       </span>
 
       {/* Section links */}

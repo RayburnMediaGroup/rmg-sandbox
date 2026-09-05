@@ -364,7 +364,7 @@ export default function PhotographerPage() {
       {/* ── FOOTER — identical to band footer ────────────────────────────── */}
       <div style={{ borderTop: border1, padding: isMobile ? "16px 20px" : "20px 56px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
         <p style={{ ...lbl }}>Backstage Flash · {PROFILE.origin}</p>
-        <p style={{ ...lbl }}>BandStack · <span style={{ color: tokens.accent }}>Powered by Rayburn Media Group</span></p>
+        <p style={{ ...lbl }}>bandwidth · <span style={{ color: tokens.accent }}>powered by RMG</span></p>
       </div>
 
       {/* ── PIN MODAL ────────────────────────────────────────────────────── */}

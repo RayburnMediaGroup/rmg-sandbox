@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 
-const ADMIN_SECRET = "bandwidth-admin-2026";
-
 type WaitlistRow = {
   id: string;
   email: string;
@@ -21,12 +19,29 @@ export default function AdminPage() {
   const [sending, setSending] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
+  async function handleAuth() {
+    if (!pin) return;
+    // Validate against server — secret never compared client-side
+    const res = await fetch("/api/admin-list", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ secret: pin }),
+    });
+    if (res.ok) {
+      const { data } = await res.json();
+      setRows(data ?? []);
+      setAuthed(true);
+    } else {
+      setMessage("incorrect password");
+    }
+  }
+
   async function loadList() {
     setLoading(true);
     const res = await fetch("/api/admin-list", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ secret: ADMIN_SECRET }),
+      body: JSON.stringify({ secret: pin }),
     });
     const { data } = await res.json();
     setRows(data ?? []);
@@ -44,7 +59,7 @@ export default function AdminPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        secret: ADMIN_SECRET,
+        secret: pin,
         email: row.email,
         first_name: row.first_name,
       }),
@@ -71,15 +86,16 @@ export default function AdminPage() {
             value={pin}
             onChange={e => setPin(e.target.value)}
             placeholder="password"
-            onKeyDown={e => e.key === "Enter" && pin === ADMIN_SECRET && setAuthed(true)}
+            onKeyDown={e => { if (e.key === "Enter") handleAuth(); }}
             style={{ ...T, width: "100%", background: "transparent", border: "none", borderBottom: "1px solid #333", color: "#d8d8d8", padding: "12px 0", fontSize: "1rem", outline: "none", marginBottom: "1rem" }}
           />
           <button
-            onClick={() => pin === ADMIN_SECRET && setAuthed(true)}
+            onClick={handleAuth}
             style={{ ...T, background: "#d4a843", color: "#080808", border: "none", padding: "12px 24px", borderRadius: 4, fontSize: "0.8rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}
           >
             enter
           </button>
+          {message && <p style={{ ...T, color: "#d95c5c", fontSize: "0.75rem", marginTop: "0.75rem" }}>{message}</p>}
         </div>
       </div>
     );

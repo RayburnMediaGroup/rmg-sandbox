@@ -1,11 +1,8 @@
-import StagePlotEditor from "@/components/band/StagePlotEditor";
-
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 export default function Page() {
-  return (
-    <StagePlotEditor
-      artistKey="plot-standalone"
-      backHref="/plot"
-      viewHref="/plot"
-    />
-  );
+  const router = useRouter();
+  useEffect(() => { router.replace("/login"); }, [router]);
+  return null;
 }

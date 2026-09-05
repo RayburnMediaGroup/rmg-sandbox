@@ -1,11 +1,8 @@
-import StagePlotView from "@/components/band/StagePlotView";
-
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 export default function Page() {
-  return (
-    <StagePlotView
-      artistKey="template"
-      editHref="/bandstack/template/stage-plot/edit"
-      backHref="/bandstack/template"
-    />
-  );
+  const router = useRouter();
+  useEffect(() => { router.replace("/login"); }, [router]);
+  return null;
 }

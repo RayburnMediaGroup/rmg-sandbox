@@ -54,7 +54,7 @@ export default function LoginPage() {
     const res = await fetch("/api/check-invited", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: data.user.id }),
+      body: JSON.stringify({ user_id: data.user.id, email: data.user.email }),
     });
     const { invited } = await res.json();
 

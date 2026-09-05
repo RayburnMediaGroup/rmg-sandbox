@@ -99,6 +99,18 @@ body {
 .overflow-hidden > img { border-radius: inherit; }
 .glass-card > .overflow-hidden:first-child { border-radius: 1.25rem 1.25rem 0 0; }
 
+/* ─── Print / PDF export ─────────────────────────────────────── */
+@media print {
+  /* Hide nav, dashboard, share, edit controls, modals */
+  [data-print-hide],
+  [data-edit-controls] { display: none !important; }
+
+  body { background: #fff !important; color: #111 !important; }
+
+  /* Ensure sections break cleanly */
+  section { break-inside: avoid; }
+}
+
 /* ─── Horizontal scroll strips ───────────────────────────────── */
 .overflow-x-auto {
   padding-top: 8px;

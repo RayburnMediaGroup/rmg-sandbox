@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import type { ProfileData } from "@/lib/bandProfile";
 
 interface Props {
   onClose: () => void;
@@ -12,6 +13,7 @@ interface Props {
   bandName: string;
   editMode: boolean;
   profileKey: string;
+  profile: ProfileData;
 }
 
 const PLATFORM_LINKS = [
@@ -44,7 +46,7 @@ const PLATFORM_LINKS = [
 
 const categories = [...new Set(PLATFORM_LINKS.map(l => l.category))];
 
-export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey }: Props) {
+export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey, profile }: Props) {
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
   const lbl: React.CSSProperties = { ...T, fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "#555", fontWeight: 500 };
   const router = useRouter();
@@ -108,6 +110,25 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
           <div style={{ width: 36, height: 20, borderRadius: 10, background: editMode ? accentColor : "#222", border: `1px solid ${editMode ? accentColor : "#333"}`, display: "flex", alignItems: "center", padding: "0 3px", justifyContent: editMode ? "flex-end" : "flex-start", transition: "all 0.2s" }}>
             <div style={{ width: 14, height: 14, borderRadius: "50%", background: editMode ? "#000" : "#444" }} />
           </div>
+        </div>
+
+        {/* Downloads */}
+        <div style={{ margin: "1rem 1.5rem 0", display: "flex", gap: "0.5rem" }}>
+          <button
+            onClick={() => { onClose(); setTimeout(() => window.print(), 100); }}
+            style={{ ...T, flex: 1, background: accentColor, border: "none", borderRadius: 6, color: "#000", fontSize: "0.72rem", fontWeight: 700, padding: "9px 12px", cursor: "pointer", letterSpacing: "0.04em" }}
+          >⬇ Download EPK (PDF)</button>
+          <button
+            onClick={() => {
+              const blob = new Blob([JSON.stringify(profile, null, 2)], { type: "application/json" });
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = `${(profile.name ?? "band").toLowerCase().replace(/\s+/g, "-")}-bandstack.json`;
+              a.click();
+              URL.revokeObjectURL(a.href);
+            }}
+            style={{ ...T, background: "transparent", border: `1px solid ${accentColor}44`, borderRadius: 6, color: accentColor, fontSize: "0.68rem", fontWeight: 600, padding: "9px 12px", cursor: "pointer", whiteSpace: "nowrap" }}
+          >{ } Export JSON</button>
         </div>
 
         {/* Affiliate / Referral */}

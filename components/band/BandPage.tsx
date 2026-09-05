@@ -290,7 +290,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       </div>
 
       {/* ── Sticky nav ── */}
-      <div style={{
+      <div data-print-hide style={{
         position: "sticky", top: 0, zIndex: 100,
         background: isLt ? "rgba(245,245,245,0.94)" : "rgba(10,10,10,0.92)",
         backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
@@ -419,6 +419,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
           bandName={profile.name}
           editMode={editMode}
           profileKey={profileKey}
+          profile={profile}
           onToggleEditMode={() => { setEditMode(e => { const next = !e; try { if (next) sessionStorage.setItem(EDIT_KEY, "1"); else sessionStorage.removeItem(EDIT_KEY); } catch {} return next; }); setShowDashboard(false); }}
           onClose={() => setShowDashboard(false)}
           onLock={() => { setArtistUnlocked(false); setEditMode(false); try { sessionStorage.removeItem(EDIT_KEY); } catch {} }}

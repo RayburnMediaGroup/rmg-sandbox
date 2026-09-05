@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { lockSession } from "@/lib/artistAuth";
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 interface Props {
   onClose: () => void;
@@ -46,6 +47,7 @@ const categories = [...new Set(PLATFORM_LINKS.map(l => l.category))];
 export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey }: Props) {
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
   const lbl: React.CSSProperties = { ...T, fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "#555", fontWeight: 500 };
+  const router = useRouter();
 
   const [refVisits, setRefVisits] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -66,10 +68,9 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handleLock() {
-    lockSession(profileKey);
-    onLock();
-    onClose();
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.replace("/login");
   }
 
   return (
@@ -91,7 +92,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
             <p style={{ ...T, fontWeight: 700, fontSize: "0.9rem", color: "#d8d8d8" }}>{bandName}</p>
           </div>
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-            <button onClick={handleLock} style={{ ...T, background: "transparent", border: "1px solid #333", borderRadius: 6, color: "#666", fontSize: "0.68rem", padding: "6px 10px", cursor: "pointer", letterSpacing: "0.05em" }}>🔒 Lock</button>
+            <button onClick={handleSignOut} style={{ ...T, background: "transparent", border: "1px solid #333", borderRadius: 6, color: "#666", fontSize: "0.68rem", padding: "6px 10px", cursor: "pointer", letterSpacing: "0.05em" }}>Sign Out</button>
             <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#555", fontSize: "1.2rem", cursor: "pointer", lineHeight: 1 }}>✕</button>
           </div>
         </div>

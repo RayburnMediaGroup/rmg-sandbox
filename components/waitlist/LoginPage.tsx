@@ -50,14 +50,15 @@ export default function LoginPage() {
       return;
     }
 
-    // Query waitlist using the authenticated user's id — RLS allows this
-    const { data: row } = await supabase
-      .from("waitlist")
-      .select("invited")
-      .eq("user_id", data.user.id)
-      .maybeSingle();
+    // Check invited status via server API (bypasses RLS)
+    const res = await fetch("/api/check-invited", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: data.user.id }),
+    });
+    const { invited } = await res.json();
 
-    if (row?.invited === true) {
+    if (invited) {
       router.push("/intake");
     } else {
       router.push("/waiting");

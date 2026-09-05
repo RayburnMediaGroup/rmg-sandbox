@@ -59,14 +59,18 @@ export default function WaitlistPage() {
       return;
     }
 
-    // Insert waitlist row immediately — user_id optional (may be null before email confirm)
-    await supabase.from("waitlist").upsert({
+    // Insert waitlist row — ignore duplicate email (already on list)
+    const { error: insertError } = await supabase.from("waitlist").insert({
       user_id: data.user?.id ?? null,
       first_name: firstName.trim(),
       last_name: lastName.trim(),
       email: email.trim().toLowerCase(),
       invited: false,
-    }, { onConflict: "email" });
+    });
+
+    if (insertError && insertError.code !== "23505") {
+      console.error("Waitlist insert failed:", insertError);
+    }
 
     setLoading(false);
     setStage("check-email");

@@ -311,6 +311,25 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
             })}
           </div>
           <button
+            onClick={async () => {
+              const url = window.location.href;
+              const title = profile.name ?? "BandStack";
+              if (navigator.share) {
+                try { await navigator.share({ title, url }); } catch {}
+              } else {
+                try { await navigator.clipboard.writeText(url); } catch {}
+                alert("Link copied!");
+              }
+            }}
+            title="Share this page"
+            style={{
+              background: "transparent", border: `1px solid ${tokens.border2}`,
+              borderRadius: 6, padding: "5px 8px", marginRight: 4, flexShrink: 0,
+              cursor: "pointer", color: tokens.muted2,
+              fontSize: isMobile ? "0.7rem" : "0.8rem", lineHeight: 1,
+            }}
+          >↗</button>
+          <button
             onClick={() => artistUnlocked ? setShowDashboard(true) : setShowPinModal(true)}
             title={artistUnlocked ? "Artist Dashboard" : "Artist Login"}
             style={{

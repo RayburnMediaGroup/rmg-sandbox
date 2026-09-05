@@ -35,13 +35,13 @@ export default function VerifiedPage() {
     }
 
     async function upsertWaitlist(user: { id: string; email?: string; user_metadata?: Record<string, string> }) {
-      await supabase.from("waitlist").upsert({
+      await supabase.from("waitlist").insert({
         user_id: user.id,
         first_name: user.user_metadata?.first_name ?? "",
         last_name: user.user_metadata?.last_name ?? "",
         email: user.email,
         invited: false,
-      }, { onConflict: "email" });
+      });
     }
 
     writeWaitlist();

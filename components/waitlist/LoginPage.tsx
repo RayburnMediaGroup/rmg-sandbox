@@ -39,25 +39,25 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
 
-    if (authError) {
+    if (authError || !data.user) {
       setError("incorrect email or password.");
       setLoading(false);
       return;
     }
 
-    // Check if user is invited
-    const { data: waitlistRow } = await supabase
+    // Query waitlist using the authenticated user's id — RLS allows this
+    const { data: row } = await supabase
       .from("waitlist")
       .select("invited")
-      .eq("email", authData.user?.email ?? "")
-      .single();
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
-    if (waitlistRow?.invited) {
+    if (row?.invited === true) {
       router.push("/intake");
     } else {
       router.push("/waiting");
@@ -68,7 +68,7 @@ export default function LoginPage() {
     <div style={{
       height: "100vh",
       minHeight: 600,
-      background: "#080808",
+      backgroundColor: "#080808",
       backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.88) 0%, rgba(8,8,8,0.80) 40%, rgba(8,8,8,0.85) 70%, rgba(8,8,8,0.96) 100%), url('/red-rocks-hero.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center 30%",

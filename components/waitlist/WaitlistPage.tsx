@@ -6,8 +6,8 @@ import { supabase } from "@/lib/supabase";
 const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
 
 const GOLD = "#d4a843";
-const GOLD_DIM = "#a07c28";
-const GOLD_LINE = "rgba(212,168,67,0.55)";
+const GOLD_DIM = "#d4a843";
+const GOLD_LINE = "rgba(212,168,67,0.85)";
 
 const inputStyle: React.CSSProperties = {
   ...T,
@@ -112,7 +112,7 @@ export default function WaitlistPage() {
       height: "100vh",
       minHeight: 600,
       backgroundColor: "#080808",
-      backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.88) 0%, rgba(8,8,8,0.80) 40%, rgba(8,8,8,0.85) 70%, rgba(8,8,8,0.96) 100%), url('/red-rocks-hero.jpg')",
+      backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.55) 0%, rgba(8,8,8,0.45) 40%, rgba(8,8,8,0.60) 70%, rgba(8,8,8,0.80) 100%), url('/red-rocks-hero.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center 30%",
       backgroundRepeat: "no-repeat",

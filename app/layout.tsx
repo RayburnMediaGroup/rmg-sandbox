@@ -25,8 +25,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RMG Sandbox",
-  description: "RMG component sandbox — live test environment for every UI element",
+  title: "bandwidth",
+  description: "One link. Everything a venue, booker, or sound engineer needs from you.",
+  openGraph: {
+    title: "bandwidth",
+    description: "One link. Everything a venue, booker, or sound engineer needs from you.",
+    url: "https://bandstack-template.vercel.app",
+    siteName: "bandwidth",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "bandwidth — live music platform" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "bandwidth",
+    description: "One link. Everything a venue, booker, or sound engineer needs from you.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

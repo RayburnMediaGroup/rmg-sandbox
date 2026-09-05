@@ -267,7 +267,8 @@ export default function IntakeForm() {
       slug = `${baseSlug}-${attempts}`;
     }
 
-    const { error } = await supabase.from("bands").insert({ slug, profile });
+    const { data: { session } } = await supabase.auth.getSession();
+    const { error } = await supabase.from("bands").insert({ slug, profile, user_id: session?.user?.id ?? null });
 
     if (error) {
       // Show error visibly so we can diagnose

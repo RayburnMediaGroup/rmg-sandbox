@@ -9,23 +9,31 @@ import type { ProfileData } from "@/lib/bandProfile";
 export default function BandSlugPage() {
   const { slug } = useParams<{ slug: string }>();
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
-    // Always fetch from Supabase — ensures any device gets the latest saved data
-    supabase
-      .from("bands")
-      .select("profile")
-      .eq("slug", slug)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (error || !data) {
-          setNotFound(true);
-        } else {
-          setProfile(data.profile as ProfileData);
-        }
-      });
+
+    async function load() {
+      const [{ data: bandData, error }, { data: { session } }] = await Promise.all([
+        supabase.from("bands").select("profile, user_id").eq("slug", slug).maybeSingle(),
+        supabase.auth.getSession(),
+      ]);
+
+      if (error || !bandData) {
+        setNotFound(true);
+        return;
+      }
+
+      setProfile(bandData.profile as ProfileData);
+      // Only the user who created this band can edit it
+      if (session?.user?.id && bandData.user_id && session.user.id === bandData.user_id) {
+        setIsOwner(true);
+      }
+    }
+
+    load();
   }, [slug]);
 
   if (notFound) {
@@ -57,7 +65,7 @@ export default function BandSlugPage() {
       profileKey={profileKey}
       defaultProfile={profile}
       stagePlotHref={`/bandstack/${slug}/stage-plot`}
-      defaultEditMode={true}
+      defaultEditMode={isOwner}
       supabaseSlug={slug}
     />
   );

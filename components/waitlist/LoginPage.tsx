@@ -39,7 +39,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
@@ -50,7 +50,18 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/intake");
+    // Check if user is invited
+    const { data: waitlistRow } = await supabase
+      .from("waitlist")
+      .select("invited")
+      .eq("email", authData.user?.email ?? "")
+      .single();
+
+    if (waitlistRow?.invited) {
+      router.push("/intake");
+    } else {
+      router.push("/waiting");
+    }
   }
 
   return (

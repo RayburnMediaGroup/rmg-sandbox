@@ -55,10 +55,10 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
 
   const [refVisits, setRefVisits] = useState(0);
   const [copied, setCopied] = useState(false);
-  const pageUrl = `https://bandstack-template.vercel.app/bandstack/${supabaseSlug ?? profileKey}`;
+  const pageUrl = `https://rmg-sandbox.vercel.app/bandstack/${supabaseSlug ?? profileKey}`;
 
   const refCode = bandName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-  const refUrl = `https://bandstack-template.vercel.app/?ref=${refCode}`;
+  const refUrl = `https://rmg-sandbox.vercel.app/?ref=${refCode}`;
 
   useEffect(() => {
     try {

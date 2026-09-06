@@ -54,6 +54,7 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
 
   const [refVisits, setRefVisits] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [pageUrl, setPageUrl] = useState("");
 
   const refCode = bandName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const refUrl = `https://bandstack-template.vercel.app/?ref=${refCode}`;
@@ -64,6 +65,10 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
       setRefVisits(count);
     } catch {}
   }, [refCode]);
+
+  useEffect(() => {
+    setPageUrl(`${window.location.origin}/bandstack/${profileKey}`);
+  }, [profileKey]);
 
   function copyRefLink() {
     try { navigator.clipboard.writeText(refUrl); } catch {}
@@ -135,12 +140,14 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
         {/* QR Code */}
         <div style={{ margin: "1rem 1.5rem 0", padding: "16px 18px", borderRadius: 8, background: "#111", border: `1px solid #1e1e1e`, display: "flex", alignItems: "center", gap: "1.25rem" }}>
           <div style={{ background: "#fff", padding: 8, borderRadius: 4, flexShrink: 0 }}>
-            <QRCode
-              value={typeof window !== "undefined" ? window.location.href : ""}
-              size={80}
-              fgColor="#080808"
-              bgColor="#ffffff"
-            />
+            {pageUrl && (
+              <QRCode
+                value={pageUrl}
+                size={80}
+                fgColor="#080808"
+                bgColor="#ffffff"
+              />
+            )}
           </div>
           <div>
             <p style={{ ...T, fontSize: "0.82rem", fontWeight: 600, color: "#d8d8d8", marginBottom: "0.25rem" }}>Your QR Code</p>

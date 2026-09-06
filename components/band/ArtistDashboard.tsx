@@ -14,6 +14,7 @@ interface Props {
   bandName: string;
   editMode: boolean;
   profileKey: string;
+  supabaseSlug?: string;
   profile: ProfileData;
 }
 
@@ -47,14 +48,14 @@ const PLATFORM_LINKS = [
 
 const categories = [...new Set(PLATFORM_LINKS.map(l => l.category))];
 
-export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey, profile }: Props) {
+export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, accentColor, bandName, editMode, profileKey, supabaseSlug, profile }: Props) {
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
   const lbl: React.CSSProperties = { ...T, fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", color: "#555", fontWeight: 500 };
   const router = useRouter();
 
   const [refVisits, setRefVisits] = useState(0);
   const [copied, setCopied] = useState(false);
-  const pageUrl = `https://bandstack-template.vercel.app/bandstack/${profileKey}`;
+  const pageUrl = `https://bandstack-template.vercel.app/bandstack/${supabaseSlug ?? profileKey}`;
 
   const refCode = bandName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   const refUrl = `https://bandstack-template.vercel.app/?ref=${refCode}`;

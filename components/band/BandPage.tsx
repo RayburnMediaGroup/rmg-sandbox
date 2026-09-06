@@ -419,6 +419,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
           bandName={profile.name}
           editMode={editMode}
           profileKey={profileKey}
+          supabaseSlug={supabaseSlug}
           profile={profile}
           onToggleEditMode={() => { setEditMode(e => { const next = !e; try { if (next) sessionStorage.setItem(EDIT_KEY, "1"); else sessionStorage.removeItem(EDIT_KEY); } catch {} return next; }); setShowDashboard(false); }}
           onClose={() => setShowDashboard(false)}

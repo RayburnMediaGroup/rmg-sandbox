@@ -1,53 +1,22 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import BandPage from "@/components/band/BandPage";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+import BandPageClient from "./BandPageClient";
 import type { ProfileData } from "@/lib/bandProfile";
 
-export default function BandSlugPage() {
-  const { slug } = useParams<{ slug: string }>();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [isOwner, setIsOwner] = useState(false);
-  const [notFound, setNotFound] = useState(false);
+const supabase = createClient(
+  "https://uhxqxdwxwogkyrhvegqh.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoeHF4ZHd4d29na3lyaHZlZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNzE1NzQsImV4cCI6MjEwMzk0NzU3NH0.-8XO6XU5tYmMxuCQ_RsgxJYm4nIOo_DOFbDKbuJmUPk"
+);
 
-  useEffect(() => {
-    if (!slug) return;
+export default async function BandSlugPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-    async function load() {
-      const [{ data: bandData, error }, { data: { session } }] = await Promise.all([
-        supabase.from("bands").select("profile, user_id").eq("slug", slug).maybeSingle(),
-        supabase.auth.getSession(),
-      ]);
+  const { data: bandData } = await supabase
+    .from("bands")
+    .select("profile, user_id")
+    .eq("slug", slug)
+    .maybeSingle();
 
-      if (error) {
-        console.error("Supabase error:", error);
-        // Retry once before giving up
-        const retry = await supabase.from("bands").select("profile, user_id").eq("slug", slug).maybeSingle();
-        if (retry.error || !retry.data) {
-          setNotFound(true);
-          return;
-        }
-        setProfile(retry.data.profile as ProfileData);
-        return;
-      }
-      if (!bandData) {
-        setNotFound(true);
-        return;
-      }
-
-      setProfile(bandData.profile as ProfileData);
-      // Only the user who created this band can edit it
-      if (session?.user?.id && bandData.user_id && session.user.id === bandData.user_id) {
-        setIsOwner(true);
-      }
-    }
-
-    load();
-  }, [slug]);
-
-  if (notFound) {
+  if (!bandData) {
     return (
       <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
         <p style={{ fontFamily: "Inter, system-ui, sans-serif", color: "#555", fontSize: "0.9rem" }}>
@@ -60,24 +29,11 @@ export default function BandSlugPage() {
     );
   }
 
-  if (!profile) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#c8a86b", animation: "breathe 2.8s ease-in-out infinite" }} />
-        <style>{`@keyframes breathe{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.5);opacity:1}}`}</style>
-      </div>
-    );
-  }
-
-  const profileKey = `bandstack-${slug}-v1`;
-
   return (
-    <BandPage
-      profileKey={profileKey}
-      defaultProfile={profile}
-      stagePlotHref={`/bandstack/${slug}/stage-plot`}
-      defaultEditMode={isOwner}
-      supabaseSlug={slug}
+    <BandPageClient
+      slug={slug}
+      profile={bandData.profile as ProfileData}
+      bandUserId={bandData.user_id}
     />
   );
 }

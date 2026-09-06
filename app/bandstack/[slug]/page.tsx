@@ -21,7 +21,18 @@ export default function BandSlugPage() {
         supabase.auth.getSession(),
       ]);
 
-      if (error || !bandData) {
+      if (error) {
+        console.error("Supabase error:", error);
+        // Retry once before giving up
+        const retry = await supabase.from("bands").select("profile, user_id").eq("slug", slug).maybeSingle();
+        if (retry.error || !retry.data) {
+          setNotFound(true);
+          return;
+        }
+        setProfile(retry.data.profile as ProfileData);
+        return;
+      }
+      if (!bandData) {
         setNotFound(true);
         return;
       }

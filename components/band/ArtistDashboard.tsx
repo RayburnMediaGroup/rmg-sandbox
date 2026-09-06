@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import QRCode from "react-qr-code";
 import type { ProfileData } from "@/lib/bandProfile";
 
 interface Props {
@@ -129,6 +130,22 @@ export default function ArtistDashboard({ onClose, onLock, onToggleEditMode, acc
             }}
             style={{ ...T, background: "transparent", border: `1px solid ${accentColor}44`, borderRadius: 6, color: accentColor, fontSize: "0.68rem", fontWeight: 600, padding: "9px 12px", cursor: "pointer", whiteSpace: "nowrap" }}
           >{ } Export JSON</button>
+        </div>
+
+        {/* QR Code */}
+        <div style={{ margin: "1rem 1.5rem 0", padding: "16px 18px", borderRadius: 8, background: "#111", border: `1px solid #1e1e1e`, display: "flex", alignItems: "center", gap: "1.25rem" }}>
+          <div style={{ background: "#fff", padding: 8, borderRadius: 4, flexShrink: 0 }}>
+            <QRCode
+              value={typeof window !== "undefined" ? window.location.href : ""}
+              size={80}
+              fgColor="#080808"
+              bgColor="#ffffff"
+            />
+          </div>
+          <div>
+            <p style={{ ...T, fontSize: "0.82rem", fontWeight: 600, color: "#d8d8d8", marginBottom: "0.25rem" }}>Your QR Code</p>
+            <p style={{ ...lbl, color: "#666", textTransform: "none", letterSpacing: 0, fontSize: "0.68rem", lineHeight: 1.6 }}>Scan to open this page. Share it, print it, put it on a business card.</p>
+          </div>
         </div>
 
         {/* Affiliate / Referral */}

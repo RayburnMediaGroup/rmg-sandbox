@@ -59,7 +59,23 @@ export default function LoginPage() {
     const { invited } = await res.json();
 
     if (invited) {
-      router.push("/intake");
+      // Check if they already have a band page
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: band } = await sb
+        .from("bands")
+        .select("slug")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+      if (band?.slug) {
+        router.push(`/bandstack/${band.slug}`);
+      } else {
+        router.push("/intake");
+      }
     } else {
       router.push("/waiting");
     }

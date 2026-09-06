@@ -29,5 +29,18 @@ export async function POST(req: NextRequest) {
     data = result.data;
   }
 
-  return NextResponse.json({ invited: data?.invited === true });
+  const invited = data?.invited === true;
+
+  // If invited, also check for existing band page
+  let slug: string | null = null;
+  if (invited && user_id) {
+    const { data: band } = await adminSupabase
+      .from("bands")
+      .select("slug")
+      .eq("user_id", user_id)
+      .maybeSingle();
+    slug = band?.slug ?? null;
+  }
+
+  return NextResponse.json({ invited, slug });
 }

@@ -56,19 +56,11 @@ export default function LoginPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user_id: data.user.id, email: data.user.email }),
     });
-    const { invited } = await res.json();
+    const { invited, slug } = await res.json();
 
     if (invited) {
-      // Check if they already have a band page
-      const { supabase: sb } = await import("@/lib/supabase");
-      const { data: band } = await sb
-        .from("bands")
-        .select("slug")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
-
-      if (band?.slug) {
-        router.push(`/bandstack/${band.slug}`);
+      if (slug) {
+        router.push(`/bandstack/${slug}`);
       } else {
         router.push("/intake");
       }

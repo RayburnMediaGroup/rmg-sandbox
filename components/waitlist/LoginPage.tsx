@@ -60,11 +60,7 @@ export default function LoginPage() {
 
     if (invited) {
       // Check if they already have a band page
-      const { createClient } = await import("@supabase/supabase-js");
-      const sb = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
+      const { supabase: sb } = await import("@/lib/supabase");
       const { data: band } = await sb
         .from("bands")
         .select("slug")

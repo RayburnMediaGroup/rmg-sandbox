@@ -12,9 +12,9 @@ const PLATFORMS = [
   { key: "youtube",    label: "YouTube",      color: "#FF0000" },
   { key: "spotify",    label: "Spotify",      color: "#1DB954" },
   { key: "appleMusic", label: "Apple Music",  color: "#FC3C44" },
+  { key: "amazonMusic",label: "Amazon Music", color: "#00A8E1" },
   { key: "soundcloud", label: "SoundCloud",   color: "#FF5500" },
   { key: "bandcamp",   label: "Bandcamp",     color: "#1DA0C3" },
-  { key: "amazonMusic",label: "Amazon Music", color: "#00A8E1" },
 ] as const;
 
 interface Props {

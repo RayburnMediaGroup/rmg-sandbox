@@ -14,9 +14,10 @@ interface Props {
   isArtist?: boolean;
   onUpdate?: (u: Partial<ProfileData>) => void;
   stagePlotHref?: string;
+  onNavigate?: (tab: string) => void;
 }
 
-export default function AboutSection({ profile, tokens, isArtist, onUpdate, stagePlotHref = "/band/stage-plot" }: Props) {
+export default function AboutSection({ profile, tokens, isArtist, onUpdate, stagePlotHref = "/band/stage-plot", onNavigate }: Props) {
   const isMobile = useMobile();
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberRole, setNewMemberRole] = useState("");
@@ -216,7 +217,7 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
                       <span style={{ ...T, fontSize: "0.82rem", color: tokens.text, fontWeight: 300 }}>Booking Email</span>
                       <EditField value={profile.bookingEmail} onSave={v => onUpdate?.({ bookingEmail: v })} accentColor={tokens.accent} style={{ ...lbl, color: tokens.muted2 }} />
                     </div>
-                  : <button onClick={() => (document.querySelector("[data-tab='epk']") as HTMLButtonElement)?.click()} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: border1, textDecoration: "none", alignItems: "center", background: "none", border: "none", width: "100%", cursor: "pointer" }}>
+                  : <button onClick={() => onNavigate?.("epk")} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: border1, textDecoration: "none", alignItems: "center", background: "none", border: "none", width: "100%", cursor: "pointer" }}>
                       <span style={{ ...T, fontSize: "0.82rem", color: tokens.text, fontWeight: 300 }}>Press Kit / EPK</span>
                       <span style={{ ...lbl, color: tokens.muted2 }}>View →</span>
                     </button>

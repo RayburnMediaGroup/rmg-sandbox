@@ -170,10 +170,13 @@ export default function LoginPage() {
               {loading ? "signing in…" : "sign in"}
             </button>
 
-            <p style={{ ...T, fontSize: "0.68rem", color: "#666", textAlign: "center", marginTop: "1.5rem" }}>
-              don&apos;t have an account?{" "}
-              <a href="/" style={{ color: GOLD_DIM, textDecoration: "none" }}>request access</a>
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
+              <p style={{ ...T, fontSize: "0.68rem", color: "#666" }}>
+                don&apos;t have an account?{" "}
+                <a href="/" style={{ color: GOLD_DIM, textDecoration: "none" }}>request access</a>
+              </p>
+              <a href="/forgot-password" style={{ ...T, fontSize: "0.68rem", color: GOLD_DIM, textDecoration: "none" }}>Forgot password?</a>
+            </div>
           </form>
 
         </div>

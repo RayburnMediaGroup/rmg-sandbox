@@ -504,7 +504,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       )}
 
       {/* ── Sections ── */}
-      {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
+      {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} onNavigate={setActive} />}
       {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "shows"      && <ShowsSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
@@ -519,7 +519,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {active === "epk"        && <EPKSection        profile={profile} tokens={tokens} />}
       {active === "links"      && <LinksSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "tickets"    && <TicketsSection    profile={profile} tokens={tokens} />}
-      {active === "mailing-list" && <MailingListSection profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
+      {active === "mailing-list" && <MailingListSection profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} bandSlug={supabaseSlug} />}
       {active === "resources"  && <ResourcesSection  tokens={tokens} />}
       {active === "contact"    && <ContactSection    profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
       {active === "venue-crm"  && artistUnlocked && <VenueCRMSection profile={profile} tokens={tokens} onUpdate={onUpdate} />}

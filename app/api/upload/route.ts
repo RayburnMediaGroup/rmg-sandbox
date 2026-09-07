@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
+import { createClient } from "@supabase/supabase-js";
+
+export const runtime = "nodejs";
 
 const MAX_BYTES = 1 * 1024 * 1024; // 1MB
-const UPLOAD_DIR = join(process.cwd(), "public", "uploads");
 
 function buildWatermarkSvg(text: string, width: number, height: number): Buffer {
   const fontSize = Math.round(Math.min(width, height) * 0.045);
   const diag = Math.sqrt(width * width + height * height);
-  // Repeat text across a wide strip rotated 30°
   const repeat = Math.ceil(diag / (text.length * fontSize * 0.6)) + 2;
   const textRow = Array(repeat).fill(text).join("   ·   ");
 
@@ -50,7 +48,6 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Get image dimensions before compositing
     const meta = await sharp(buffer).metadata();
     const width = meta.width ?? 1200;
     const height = meta.height ?? 900;
@@ -65,14 +62,27 @@ export async function POST(req: NextRequest) {
     }
 
     const webpBuffer = await pipeline.toBuffer();
-
-    if (!existsSync(UPLOAD_DIR)) await mkdir(UPLOAD_DIR, { recursive: true });
-
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}.webp`;
-    await writeFile(join(UPLOAD_DIR, filename), webpBuffer);
+
+    // Upload to Supabase Storage instead of local filesystem
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SECRET_KEY!
+    );
+
+    const { error: uploadError } = await supabase.storage
+      .from("uploads")
+      .upload(filename, webpBuffer, { contentType: "image/webp", upsert: false });
+
+    if (uploadError) {
+      console.error("[upload] Supabase storage error:", uploadError);
+      return NextResponse.json({ error: "Storage upload failed" }, { status: 500 });
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from("uploads").getPublicUrl(filename);
 
     return NextResponse.json({
-      url: `/uploads/${filename}`,
+      url: publicUrl,
       size: webpBuffer.length,
       originalSize: file.size,
       watermarked: watermark,

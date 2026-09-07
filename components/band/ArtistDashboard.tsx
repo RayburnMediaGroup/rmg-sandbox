@@ -70,9 +70,11 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
     const newSlug = slugInput.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/(^-|-$)/g, "");
     if (!newSlug || newSlug === supabaseSlug) { setShowSlugEdit(false); return; }
     setSlugStatus("checking");
-    const { data } = await supabase.from("bands").select("slug").eq("slug", newSlug).maybeSingle();
-    if (data) { setSlugStatus("taken"); return; }
-    const { error } = await supabase.from("bands").update({ slug: newSlug }).eq("slug", supabaseSlug);
+    const { data: existing } = await supabase.from("bands").select("slug").eq("slug", newSlug).maybeSingle();
+    if (existing) { setSlugStatus("taken"); return; }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setSlugStatus("error"); return; }
+    const { error } = await supabase.from("bands").update({ slug: newSlug }).eq("slug", supabaseSlug).eq("user_id", session.user.id);
     if (error) { setSlugStatus("error"); return; }
     setSlugStatus("saved");
     setTimeout(() => router.replace(`/bandstack/${newSlug}`), 800);
@@ -162,7 +164,7 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
           <button
             onClick={() => { onClose(); setTimeout(() => window.print(), 100); }}
             style={{ ...T, flex: 1, background: accentColor, border: "none", borderRadius: 6, color: "#000", fontSize: "0.72rem", fontWeight: 700, padding: "9px 12px", cursor: "pointer", letterSpacing: "0.04em" }}
-          >⬇ Download EPK (PDF)</button>
+          >⬇ Print / Save EPK as PDF</button>
           <button
             onClick={() => {
               const blob = new Blob([JSON.stringify(profile, null, 2)], { type: "application/json" });

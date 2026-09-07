@@ -48,21 +48,23 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
   const [setlistData, setSetlistData] = useState<SetlistData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [profileViews, setProfileViews] = useState<number | null>(null);
+  const [, setProfileViews] = useState<number | null>(null);
 
   useEffect(() => {
     const artistName = profile.name || "";
 
     Promise.allSettled([
       fetch(`/api/lastfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
-      fetch(`/api/youtube${(profile.youtube || profile.youtubeChannelId) ? `?channelId=${encodeURIComponent((profile.youtube || profile.youtubeChannelId) ?? "")}` : ""}`).then(r => r.json()),
+      (profile.youtube || profile.youtubeChannelId)
+        ? fetch(`/api/youtube?channelId=${encodeURIComponent((profile.youtube || profile.youtubeChannelId) ?? "")}`).then(r => r.json())
+        : Promise.resolve(null),
       fetch(`/api/setlistfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
     ]).then(([lfm, yt, sl]) => {
       if (lfm.status === "fulfilled" && !lfm.value.error) setLastfm(lfm.value);
       else setErrors(e => ({ ...e, lastfm: lfm.status === "fulfilled" ? lfm.value.error : "Failed" }));
 
-      if (yt.status === "fulfilled" && !yt.value.error) setYoutube(yt.value);
-      else setErrors(e => ({ ...e, youtube: yt.status === "fulfilled" ? yt.value.error : "Failed" }));
+      if (yt.status === "fulfilled" && yt.value && !yt.value.error) setYoutube(yt.value);
+      else if (yt.status === "fulfilled" && yt.value?.error) setErrors(e => ({ ...e, youtube: yt.value.error }));
 
       if (sl.status === "fulfilled" && !sl.value.error) setSetlistData(sl.value);
       else setErrors(e => ({ ...e, setlist: sl.status === "fulfilled" ? sl.value.error : "Failed" }));
@@ -71,16 +73,8 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
     });
   }, [profile.name, profile.youtube, profile.youtubeChannelId]);
 
-  // Profile view counter — localStorage for dev; swap to Supabase increment at launch
-  useEffect(() => {
-    try {
-      const key = `bsViews_${profile.name ?? "band"}`;
-      const current = parseInt(localStorage.getItem(key) ?? "0", 10);
-      const next = current + 1;
-      localStorage.setItem(key, String(next));
-      setProfileViews(next);
-    } catch { setProfileViews(null); }
-  }, [profile.name]);
+  // Profile views: placeholder until Supabase analytics is wired
+  useEffect(() => { setProfileViews(null); }, []);
 
   const statCard = (label: string, value: string | number | null, sub?: string, verified?: boolean) => (
     <div style={{ background: isLt ? "#f4f4f4" : "#111", border: border1, borderRadius: 8, padding: "16px 18px" }}>
@@ -110,8 +104,7 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
         {/* Live metrics grid */}
         <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.75rem" }}>Live Metrics</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "0.75rem", marginBottom: "2.5rem" }}>
-          {statCard("Profile Views", profileViews !== null ? fmt(profileViews) : null, "Page loads tracked")}
-          {statCard("Last.fm Listeners", lastfm ? fmt(lastfm.listeners) : null, "Monthly unique listeners", !!lastfm)}
+{statCard("Last.fm Listeners", lastfm ? fmt(lastfm.listeners) : null, "Monthly unique listeners", !!lastfm)}
           {statCard("Last.fm Plays", lastfm ? fmt(lastfm.playcount) : null, "Total all-time scrobbles", !!lastfm)}
           {statCard("YouTube Subscribers", youtube ? fmt(youtube.subscribers) : null, "Channel subscribers", !!youtube)}
           {statCard("YouTube Views", youtube ? fmt(youtube.totalViews) : null, "Total channel views", !!youtube)}

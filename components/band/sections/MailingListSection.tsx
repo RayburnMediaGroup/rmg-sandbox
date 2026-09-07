@@ -5,7 +5,7 @@ import type { ProfileData } from "@/lib/bandProfile";
 import type { TokenSet } from "@/lib/genreTokens";
 import { useMobile } from "@/lib/useMobile";
 
-interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; }
+interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; bandSlug?: string; }
 
 // Mock subscriber list for UI scaffold — replace with Supabase query
 const MOCK_SUBSCRIBERS = [
@@ -23,7 +23,7 @@ const MOCK_CAMPAIGNS = [
   { subject: "New single out Friday", sent: "2026-07-30", opens: 340, recipients: 451 },
 ];
 
-export default function MailingListSection({ profile, tokens, isArtist, onUpdate }: Props) {
+export default function MailingListSection({ profile, tokens, isArtist, onUpdate, bandSlug }: Props) {
   const isMobile = useMobile();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -40,9 +40,13 @@ export default function MailingListSection({ profile, tokens, isArtist, onUpdate
   const inp: React.CSSProperties = { background: "#111", border: `1px solid ${tokens.border2}`, borderRadius: 4, color: "#d8d8d8", padding: "10px 14px", fontSize: "0.85rem", fontFamily: "Inter, sans-serif", width: "100%", outline: "none" };
   const subscriberCount = profile.mailingListCount ?? MOCK_SUBSCRIBERS.length;
 
-  function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: POST to Supabase subscribers table
+    await fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, bandSlug }),
+    });
     setSubmitted(true);
     setEmail("");
   }

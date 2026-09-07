@@ -37,18 +37,9 @@ const DEMO_RESOURCES: Resource[] = [
   { name: "Saving Country Music",      category: "Online Press",  city: "Dallas",      state: "TX", url: "https://savingcountrymusic.com",     description: "Outlaw country & Americana criticism. Known for authentic roots coverage." },
   { name: "Glide Magazine",            category: "Online Press",  city: "San Francisco", state: "CA", url: "https://glidemagazine.com",        description: "Live music, reviews & interviews. Rock, Americana & jam band focus." },
   { name: "Consequence of Sound",      category: "Online Press",  city: "Chicago",     state: "IL", url: "https://consequence.net",            description: "Major indie & Americana outlet. Tour news, album reviews, interviews." },
-  // ── Service Providers (placeholder — replace with real vendors) ──
-  { name: "Red Rocks Photo Co.",     category: "Photographer",  city: "Denver",      state: "CO", url: "https://example.com", description: "Live music & touring band photography." },
-  { name: "Westword Graphics",       category: "Designer",      city: "Denver",      state: "CO", url: "https://example.com", description: "Album artwork, posters, merch design." },
-  { name: "Emerald City Recording",  category: "Studio",        city: "Nashville",   state: "TN", url: "https://example.com", description: "Full-service tracking & mixing studio." },
-  { name: "Mile High Press",         category: "Publicist",     city: "Denver",      state: "CO", email: "press@example.com", description: "Music PR & media relations." },
-  { name: "Austin Sound Studios",    category: "Studio",        city: "Austin",      state: "TX", url: "https://example.com", description: "Recording & live room, full backline available." },
-  { name: "Lone Star Promo",         category: "Promoter",      city: "Austin",      state: "TX", url: "https://example.com", description: "Regional touring & show promotion." },
-  { name: "Third Coast Merch",       category: "Merch",         city: "Nashville",   state: "TN", url: "https://example.com", description: "Tour merch printing & fulfillment." },
-  { name: "Stage Right Lighting",    category: "Production",    city: "Nashville",   state: "TN", url: "https://example.com", description: "Lighting & stage production rentals." },
 ];
 
-const CATEGORIES = ["All", "Radio", "Magazine", "Online Press", "Photographer", "Studio", "Designer", "Publicist", "Promoter", "Merch", "Production"];
+const CATEGORIES = ["All", "Radio", "Magazine", "Online Press"];
 
 interface Props { tokens: TokenSet; }
 

@@ -49,7 +49,7 @@ export default function EPKSection({ profile, tokens }: Props) {
               ...lbl, color: isLt ? "#fff" : "#000",
               background: tokens.accent, border: "none",
               borderRadius: 3, padding: "4px 10px", cursor: "pointer",
-            }}>Download PDF</button>
+            }}>Print / Save PDF</button>
           </div>
         </div>
 

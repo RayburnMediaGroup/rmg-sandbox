@@ -504,6 +504,8 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       )}
 
       {/* ── Sections ── */}
+      <style>{`@keyframes bsFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <div key={active} style={{ animation: "bsFadeIn 0.2s ease" }}>
       {active === "about"      && <AboutSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} onNavigate={setActive} />}
       {active === "music"      && <MusicSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "lyrics"     && <LyricsSection     profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
@@ -524,6 +526,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {active === "contact"    && <ContactSection    profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
       {active === "venue-crm"  && artistUnlocked && <VenueCRMSection profile={profile} tokens={tokens} onUpdate={onUpdate} />}
       {active === "sync"       && <SyncSection       profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
+      </div>
 
       {/* Dashboard */}
       {showDashboard && artistUnlocked && (

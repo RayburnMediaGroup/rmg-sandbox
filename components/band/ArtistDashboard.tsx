@@ -6,6 +6,24 @@ import { useRouter } from "next/navigation";
 import QRCode from "react-qr-code";
 import type { ProfileData } from "@/lib/bandProfile";
 
+const THEME_OPTIONS: { label: string; genre: string; accent: string }[] = [
+  { label: "Outlaw Country",    genre: "outlaw country", accent: "#c8922a" },
+  { label: "Country",           genre: "country",        accent: "#d4b84a" },
+  { label: "Americana",         genre: "americana",      accent: "#c87941" },
+  { label: "Rock",              genre: "rock",           accent: "#e84040" },
+  { label: "Indie",             genre: "indie",          accent: "#7b68ee" },
+  { label: "Folk",              genre: "folk",           accent: "#8fbc8f" },
+  { label: "Blues",             genre: "blues",          accent: "#4a90d9" },
+  { label: "Jazz",              genre: "jazz",           accent: "#d4a843" },
+  { label: "Soul",              genre: "soul",           accent: "#c85a9e" },
+  { label: "Hip-Hop",           genre: "hip-hop",        accent: "#ff6b35" },
+  { label: "Electronic",        genre: "electronic",     accent: "#00e5ff" },
+  { label: "Ambient",           genre: "ambient",        accent: "#7ec8c8" },
+  { label: "Metal",             genre: "metal",          accent: "#9b59b6" },
+  { label: "Punk",              genre: "punk",           accent: "#ff2d55" },
+  { label: "Alternative",       genre: "alternative",    accent: "#50fa7b" },
+];
+
 interface Props {
   onClose: () => void;
   onLock: () => void;
@@ -158,6 +176,39 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
             {(slugStatus === "error") && <p style={{ ...lbl, color: "#d95c5c", marginTop: "0.4rem", textTransform: "none", letterSpacing: 0, fontSize: "0.62rem" }}>Something went wrong. Try again.</p>}
           </div>
         )}
+
+        {/* Page Theme */}
+        <div style={{ margin: "0.75rem 1.5rem 0", padding: "12px 14px", borderRadius: 8, background: "#111", border: "1px solid #1e1e1e" }}>
+          <p style={{ ...T, fontSize: "0.78rem", fontWeight: 600, color: "#d8d8d8", marginBottom: "0.5rem" }}>Page Theme</p>
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <select
+                value={profile.genre ?? ""}
+                onChange={async (e) => {
+                  const genre = e.target.value;
+                  onUpdate({ genre });
+                  if (supabaseSlug) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session) return;
+                    const { data: row } = await supabase.from("bands").select("profile").eq("slug", supabaseSlug).maybeSingle();
+                    if (!row) return;
+                    await supabase.from("bands").update({ profile: { ...(row.profile as object), genre } }).eq("slug", supabaseSlug).eq("user_id", session.user.id);
+                  }
+                }}
+                style={{ ...T, width: "100%", background: "#0e0e0e", border: "1px solid #333", borderRadius: 5, color: "#d8d8d8", fontSize: "0.78rem", padding: "8px 10px", cursor: "pointer", appearance: "none", outline: "none" }}
+              >
+                <option value="">— Select a theme —</option>
+                {THEME_OPTIONS.map(o => (
+                  <option key={o.genre} value={o.genre}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            {profile.genre && (
+              <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, background: THEME_OPTIONS.find(o => o.genre === profile.genre)?.accent ?? accentColor, border: "2px solid #333" }} />
+            )}
+          </div>
+          <p style={{ ...lbl, color: "#555", marginTop: "0.4rem", textTransform: "none", letterSpacing: 0, fontSize: "0.62rem" }}>Changes colors and fonts across your entire page instantly.</p>
+        </div>
 
         {/* Downloads */}
         <div style={{ margin: "1rem 1.5rem 0", display: "flex", gap: "0.5rem" }}>

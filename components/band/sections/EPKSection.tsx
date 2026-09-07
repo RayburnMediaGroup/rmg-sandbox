@@ -15,7 +15,7 @@ export default function EPKSection({ profile, tokens }: Props) {
   const border1 = `1px solid ${tokens.border}`;
   const border2 = `1px solid ${tokens.border2}`;
 
-  const epkUrl = typeof window !== "undefined" ? window.location.origin + "/band/epk" : "";
+  const epkUrl = typeof window !== "undefined" ? window.location.href : "";
   const handlePrint = () => window.print();
   const handleCopy = () => navigator.clipboard.writeText(epkUrl);
 

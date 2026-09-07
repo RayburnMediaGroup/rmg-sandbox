@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { useMobile } from "@/lib/useMobile";
 import { resolveTokens } from "@/lib/genreTokens";
-import { isUnlocked } from "@/lib/artistAuth";
-import PinUnlock from "@/components/band/PinUnlock";
 import EditField from "@/components/band/EditField";
 
 const PROFILE = {
@@ -76,13 +74,10 @@ export default function PhotographerPage() {
   const [profile, setProfile] = useState(PROFILE);
   const [active, setActive] = useState("about");
   const [lightbox, setLightbox] = useState<string | null>(null);
-  const [artistUnlocked, setArtistUnlocked] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [showPinModal, setShowPinModal] = useState(false);
 
   useEffect(() => {
     setProfile(loadPhotoProfile());
-    setArtistUnlocked(isUnlocked(PROFILE_KEY));
   }, []);
 
   function onUpdate(updates: Partial<typeof PROFILE>) {
@@ -201,7 +196,7 @@ export default function PhotographerPage() {
       {/* ── NAV — identical structure to band nav ─────────────────────────── */}
       <div style={{ position: "sticky", top: 0, zIndex: 40, borderBottom: border1, backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", background: `${tokens.bg}dd` }}>
         <div style={{ maxWidth: 860, margin: "0 auto", padding: isMobile ? "0 8px" : "0 40px", display: "flex", alignItems: "center" }}>
-          <div style={{ display: "flex", overflowX: "auto", flex: 1, scrollbarWidth: "none" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", flex: 1 }}>
             {NAV.map(n => (
               <button key={n.id} onClick={() => scrollTo(n.id)}
                 style={{ ...lbl, background: "none", border: "none", cursor: "pointer",
@@ -213,18 +208,6 @@ export default function PhotographerPage() {
               </button>
             ))}
           </div>
-          {/* Lock / Edit Mode button — same as band */}
-          <button
-            onClick={() => artistUnlocked ? setEditMode(e => !e) : setShowPinModal(true)}
-            title={artistUnlocked ? (editMode ? "Exit Edit Mode" : "Edit Mode") : "Artist Login"}
-            style={{
-              background: editMode ? `${tokens.accent}22` : artistUnlocked ? `${tokens.accent}11` : "transparent",
-              border: `1px solid ${artistUnlocked ? tokens.accent + "55" : tokens.border}`,
-              borderRadius: 6, padding: "5px 8px", marginRight: isMobile ? 8 : 0, flexShrink: 0,
-              cursor: "pointer", color: artistUnlocked ? tokens.accent : tokens.muted2,
-              fontSize: "0.68rem", lineHeight: 1, ...T,
-            }}
-          >{artistUnlocked ? (editMode ? "✓ Done" : "✏ Edit") : "🔒"}</button>
         </div>
       </div>
 
@@ -366,16 +349,6 @@ export default function PhotographerPage() {
         <p style={{ ...lbl }}>Backstage Flash · {PROFILE.origin}</p>
         <p style={{ ...lbl }}>bandwidth · <span style={{ color: tokens.accent }}>powered by RMG</span></p>
       </div>
-
-      {/* ── PIN MODAL ────────────────────────────────────────────────────── */}
-      {showPinModal && (
-        <PinUnlock
-          accentColor={tokens.accent}
-          profileKey={PROFILE_KEY}
-          onUnlock={() => { setArtistUnlocked(true); setShowPinModal(false); setEditMode(true); }}
-          onClose={() => setShowPinModal(false)}
-        />
-      )}
 
       {/* ── EDIT MODE BANNER ─────────────────────────────────────────────── */}
       {editMode && (

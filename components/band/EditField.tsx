@@ -73,8 +73,6 @@ export default function EditField({ value, onSave, multiline, placeholder, style
       title="Click to edit"
       style={{
         cursor: "text",
-        borderBottom: `1px dashed ${accentColor}55`,
-        paddingBottom: 1,
         display: "inline",
         ...style,
       }}

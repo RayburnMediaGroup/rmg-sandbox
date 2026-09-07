@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
-  const artist = req.nextUrl.searchParams.get("artist") ?? "Ryan Chrys & The Rough Cuts";
+  const artist = req.nextUrl.searchParams.get("artist");
+  if (!artist) return NextResponse.json({ error: "No artist provided" }, { status: 400 });
   const key = process.env.LASTFM_API_KEY;
 
   if (!key || key === "your_lastfm_key_here") {

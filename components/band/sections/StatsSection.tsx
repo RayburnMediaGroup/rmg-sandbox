@@ -55,7 +55,7 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
 
     Promise.allSettled([
       fetch(`/api/lastfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
-      fetch(`/api/youtube${profile.youtubeChannelId ? `?channelId=${profile.youtubeChannelId}` : ""}`).then(r => r.json()),
+      fetch(`/api/youtube${(profile.youtube || profile.youtubeChannelId) ? `?channelId=${encodeURIComponent((profile.youtube || profile.youtubeChannelId) ?? "")}` : ""}`).then(r => r.json()),
       fetch(`/api/setlistfm?artist=${encodeURIComponent(artistName)}`).then(r => r.json()),
     ]).then(([lfm, yt, sl]) => {
       if (lfm.status === "fulfilled" && !lfm.value.error) setLastfm(lfm.value);
@@ -69,7 +69,7 @@ export default function StatsSection({ profile, tokens, isArtist, onUpdate }: Pr
 
       setLoading(false);
     });
-  }, [profile.name]);
+  }, [profile.name, profile.youtube, profile.youtubeChannelId]);
 
   // Profile view counter — localStorage for dev; swap to Supabase increment at launch
   useEffect(() => {

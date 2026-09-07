@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET ?? "bandwidth-admin-2026";
-
 export async function POST(req: NextRequest) {
+  const ADMIN_SECRET = process.env.ADMIN_SECRET;
+  if (!ADMIN_SECRET) return NextResponse.json({ error: "server misconfigured" }, { status: 500 });
+
   const { secret, email, first_name } = await req.json();
 
   if (secret !== ADMIN_SECRET) {

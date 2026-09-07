@@ -116,3 +116,13 @@ body {
   padding-top: 8px;
   overflow-y: hidden;
 }
+
+/* ─── Platform chip hover ─────────────────────────────────────── */
+.platform-chip {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease !important;
+}
+.platform-chip:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5) !important;
+  opacity: 0.85 !important;
+}

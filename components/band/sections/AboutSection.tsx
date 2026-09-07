@@ -216,10 +216,10 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
                       <span style={{ ...T, fontSize: "0.82rem", color: tokens.text, fontWeight: 300 }}>Booking Email</span>
                       <EditField value={profile.bookingEmail} onSave={v => onUpdate?.({ bookingEmail: v })} accentColor={tokens.accent} style={{ ...lbl, color: tokens.muted2 }} />
                     </div>
-                  : <a href="#epk" style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: border1, textDecoration: "none", alignItems: "center" }}>
+                  : <button onClick={() => (document.querySelector("[data-tab='epk']") as HTMLButtonElement)?.click()} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: border1, textDecoration: "none", alignItems: "center", background: "none", border: "none", width: "100%", cursor: "pointer" }}>
                       <span style={{ ...T, fontSize: "0.82rem", color: tokens.text, fontWeight: 300 }}>Press Kit / EPK</span>
                       <span style={{ ...lbl, color: tokens.muted2 }}>View →</span>
-                    </a>
+                    </button>
               )}
             </div>
           </div>

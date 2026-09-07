@@ -1,11 +1,19 @@
 import { createClient } from "@supabase/supabase-js";
 import BandPageClient from "./BandPageClient";
 import type { ProfileData } from "@/lib/bandProfile";
+import type { Metadata } from "next";
 
 const supabase = createClient(
   "https://uhxqxdwxwogkyrhvegqh.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVoeHF4ZHd4d29na3lyaHZlZ3FoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNzE1NzQsImV4cCI6MjEwMzk0NzU3NH0.-8XO6XU5tYmMxuCQ_RsgxJYm4nIOo_DOFbDKbuJmUPk"
 );
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const { data } = await supabase.from("bands").select("profile").eq("slug", slug).maybeSingle();
+  const name = (data?.profile as ProfileData | null)?.name;
+  return { title: name ? `${name} · bandwidth` : "bandwidth" };
+}
 
 export default async function BandSlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

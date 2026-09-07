@@ -78,75 +78,6 @@ const ALL_PLATFORM_META = [
   { key: "bandcamp",    label: "Bandcamp",      color: "#1DA0C3", svg: <svg viewBox="0 0 24 24" fill="currentColor" width="19" height="19"><path d="M0 18.75l7.437-13.5H24l-7.438 13.5z"/></svg> },
 ] as { key: keyof ProfileData; label: string; color: string; svg: React.ReactNode }[];
 
-function SocialLinks({ profile, isOwner, hovered, setHovered }: {
-  profile: ProfileData; isOwner: boolean;
-  hovered: string | null; setHovered: (v: string | null) => void;
-}) {
-
-  function getUrl(key: keyof ProfileData, label: string) {
-    return (profile[key] as string) || (profile.links ?? []).find(l => l.label === label)?.url || "";
-  }
-
-  return (
-    <div style={{ marginTop: "0.65rem" }}>
-      <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
-        {ALL_PLATFORM_META.map(({ key, label, color, svg }) => {
-          const saved = getUrl(key, label);
-          const filled = !!saved;
-          const href = saved || PLATFORM_DEFAULTS[key as string] || "";
-          const dimmed = isOwner && !filled;
-          const isHovered = hovered === (key as string);
-
-          const chipStyle: React.CSSProperties = {
-            display: "inline-flex", alignItems: "center", gap: "0.3rem",
-            padding: "4px 9px 4px 7px",
-            borderRadius: 5,
-            border: `1px solid ${color + (isHovered ? "ff" : filled ? "70" : "35")}`,
-            background: isHovered ? color : filled ? `${color}12` : `${color}07`,
-            color: isHovered ? "#000" : filled ? color : color + "99",
-            opacity: dimmed ? 0.45 : 1,
-            textDecoration: "none",
-            fontSize: "0.68rem", fontFamily: "Inter, sans-serif",
-            letterSpacing: "0.03em", whiteSpace: "nowrap",
-            cursor: "pointer",
-            outline: "none",
-            transform: isHovered ? "translateY(-2px) scale(1.04)" : "none",
-            boxShadow: isHovered ? `0 4px 14px ${color}33` : "none",
-            transition: "all 0.15s ease",
-          };
-
-          return (
-            <a
-              key={key as string}
-              className="platform-chip"
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              style={chipStyle}
-              onMouseEnter={e => {
-                console.log("CHIP HOVER FIRED", key);
-                const el = e.currentTarget;
-                el.style.transform = "translateY(-2px) scale(1.05)";
-                el.style.boxShadow = `0 6px 18px ${color}44`;
-                el.style.filter = "brightness(1.4)";
-                el.style.border = `1px solid ${color}cc`;
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget;
-                el.style.transform = "none";
-                el.style.boxShadow = "none";
-                el.style.filter = "none";
-                el.style.border = `1px solid ${color + (filled ? "70" : "35")}`;
-              }}
-            >
-              {svg}<span>{label}</span>
-            </a>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 function MobileNav({ active, setActive, navPrimary, navPro, tokens, lbl, isLt, artistUnlocked, stagePlotHref, onShare, onDashboard, accentColor }: {
   active: string; setActive: (id: string) => void;
@@ -221,7 +152,6 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
   const [showDashboard, setShowDashboard]   = useState(false);
   const [previewMode, setPreviewMode]       = useState(false);
   const [ctaHovered, setCtaHovered]         = useState<string | null>(null);
-  const [chipHovered, setChipHovered]       = useState<string | null>(null);
   const supabaseSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function loadProfile(): ProfileData {
@@ -296,7 +226,6 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
 
   return (
     <main style={{ background: tokens.bg, minHeight: "100vh", color: tokens.text, ...T }}>
-      <style>{``}</style>
 
       {/* Artist login link — only shown when not the owner */}
       {!artistUnlocked && (
@@ -312,18 +241,20 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
         >artist login</a>
       )}
 
-      {/* ── SAMPLE USER watermark ── */}
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none",
-        display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-      }}>
-        <p style={{
-          ...T, fontSize: "clamp(2rem, 8vw, 5rem)", fontWeight: 800,
-          color: "rgba(255,255,255,0.045)", letterSpacing: "0.15em",
-          transform: "rotate(-35deg)", whiteSpace: "nowrap", userSelect: "none",
-          textTransform: "uppercase",
-        }}>SAMPLE USER</p>
-      </div>
+      {/* ── SAMPLE USER watermark — only on demo/template pages ── */}
+      {!supabaseSlug && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 9999, pointerEvents: "none",
+          display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+        }}>
+          <p style={{
+            ...T, fontSize: "clamp(2rem, 8vw, 5rem)", fontWeight: 800,
+            color: "rgba(255,255,255,0.045)", letterSpacing: "0.15em",
+            transform: "rotate(-35deg)", whiteSpace: "nowrap", userSelect: "none",
+            textTransform: "uppercase",
+          }}>SAMPLE USER</p>
+        </div>
+      )}
 
       {/* ── Hero ── */}
       <div style={{ borderBottom: `1px solid ${tokens.border}` }}>

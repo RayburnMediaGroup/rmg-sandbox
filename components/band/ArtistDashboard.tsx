@@ -183,16 +183,16 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <div style={{ position: "relative", flex: 1 }}>
               <select
-                value={profile.genre ?? ""}
+                value={profile.colorTheme ?? ""}
                 onChange={async (e) => {
-                  const genre = e.target.value;
-                  onUpdate({ genre });
+                  const colorTheme = e.target.value;
+                  onUpdate({ colorTheme });
                   if (supabaseSlug) {
                     const { data: { session } } = await supabase.auth.getSession();
                     if (!session) return;
                     const { data: row } = await supabase.from("bands").select("profile").eq("slug", supabaseSlug).maybeSingle();
                     if (!row) return;
-                    await supabase.from("bands").update({ profile: { ...(row.profile as object), genre } }).eq("slug", supabaseSlug).eq("user_id", session.user.id);
+                    await supabase.from("bands").update({ profile: { ...(row.profile as object), colorTheme } }).eq("slug", supabaseSlug).eq("user_id", session.user.id);
                   }
                 }}
                 style={{ ...T, width: "100%", background: "#0e0e0e", border: "1px solid #333", borderRadius: 5, color: "#d8d8d8", fontSize: "0.78rem", padding: "8px 10px", cursor: "pointer", appearance: "none", outline: "none" }}
@@ -203,8 +203,8 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
                 ))}
               </select>
             </div>
-            {profile.genre && (
-              <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, background: THEME_OPTIONS.find(o => o.genre === profile.genre)?.accent ?? accentColor, border: "2px solid #333" }} />
+            {profile.colorTheme && (
+              <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, background: THEME_OPTIONS.find(o => o.genre === profile.colorTheme)?.accent ?? accentColor, border: "2px solid #333" }} />
             )}
           </div>
           <p style={{ ...lbl, color: "#555", marginTop: "0.4rem", textTransform: "none", letterSpacing: 0, fontSize: "0.62rem" }}>Changes colors and fonts across your entire page instantly.</p>

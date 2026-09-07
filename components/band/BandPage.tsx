@@ -210,7 +210,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
     </main>
   );
 
-  const tokens = applyMode(resolveTokens(profile.genre ? [profile.genre] : []), profile.colorMode ?? "dark");
+  const tokens = applyMode(resolveTokens(profile.colorTheme ? [profile.colorTheme] : profile.genre ? [profile.genre] : []), profile.colorMode ?? "dark");
   const isLt = profile.colorMode === "light";
   const T: React.CSSProperties   = { fontFamily: "Inter, system-ui, sans-serif" };
   const lbl: React.CSSProperties = { ...T, fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", fontWeight: 500 };

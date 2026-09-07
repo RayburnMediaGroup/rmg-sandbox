@@ -78,6 +78,7 @@ export interface ProfileData {
   managerName?: string; managerEmail?: string; agentName?: string; agentEmail?: string;
   heroImage: string; coverImage?: string; albumArt: string;
   colorMode: "dark" | "light";
+  colorTheme?: string;
   merchUrl?: string;
   pressQuotes?: { quote: string; source: string; year?: number }[];
   awards?: string[];

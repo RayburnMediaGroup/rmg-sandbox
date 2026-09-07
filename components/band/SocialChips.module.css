@@ -21,3 +21,10 @@
   transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
+.chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--chip-color) 45%, transparent);
+  filter: brightness(1.25);
+  opacity: 1;
+}
+

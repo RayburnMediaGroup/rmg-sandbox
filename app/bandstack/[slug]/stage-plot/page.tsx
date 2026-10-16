@@ -8,6 +8,7 @@ export default function Page() {
   return (
     <StagePlotView
       artistKey={`bandstack-${slug}-v1`}
+      slug={slug}
       editHref={`/bandstack/${slug}/stage-plot/edit`}
       backHref={`/bandstack/${slug}`}
     />

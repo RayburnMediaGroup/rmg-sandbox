@@ -22,6 +22,9 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supa
   const inp: React.CSSProperties = { background: isLt ? "#fff" : "#0e0e0e", border: `1px solid ${tokens.border}`, borderRadius: 4, color: tokens.text, padding: "6px 10px", fontSize: "0.8rem", fontFamily: "Inter, sans-serif", width: "100%", outline: "none" };
 
   const [tab, setTab] = useState<Tab>("photos");
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState<{ type: "photo" | "poster"; idx: number } | null>(null);
+  const [editingLabelVal, setEditingLabelVal] = useState("");
   const [uploading, setUploading] = useState(false);
   const [newLabel, setNewLabel] = useState("");
   const [newDate, setNewDate] = useState("");
@@ -66,6 +69,19 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supa
 
   function handleDeletePhoto(idx: number) { onUpdate?.({ photos: photos.filter((_, i) => i !== idx) }); }
   function handleDeletePoster(idx: number) { onUpdate?.({ posters: posters.filter((_, i) => i !== idx) }); }
+
+  function saveLabel() {
+    if (!editingLabel) return;
+    const val = editingLabelVal.trim();
+    if (editingLabel.type === "photo") {
+      const next = photos.map((p, i) => i === editingLabel.idx ? { ...p, label: val || p.label } : p);
+      onUpdate?.({ photos: next });
+    } else {
+      const next = posters.map((p, i) => i === editingLabel.idx ? { ...p, label: val || p.label } : p);
+      onUpdate?.({ posters: next });
+    }
+    setEditingLabel(null);
+  }
 
   const tabBtn = (id: Tab, label: string) => (
     <button onClick={() => { setTab(id); resetForm(); }} style={{
@@ -125,6 +141,13 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supa
           </div>
         )}
 
+        {/* Lightbox */}
+        {lightbox && (
+          <div onClick={() => setLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}>
+            <img src={lightbox} alt="Photo" style={{ maxWidth: "92vw", maxHeight: "88vh", objectFit: "contain", borderRadius: 8, boxShadow: "0 8px 64px rgba(0,0,0,0.9)" }} />
+          </div>
+        )}
+
         {/* Press Photos grid */}
         {tab === "photos" && (
           <>
@@ -134,14 +157,29 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supa
                   {isArtist && (
                     <button onClick={() => handleDeletePhoto(i)} style={{ position: "absolute", top: 6, right: 6, zIndex: 10, background: "rgba(0,0,0,0.6)", color: "#d95c5c", border: "none", borderRadius: 3, padding: "2px 7px", fontSize: "0.65rem", cursor: "pointer", fontFamily: "Inter, sans-serif" }}>✕</button>
                   )}
-                  <div style={{ aspectRatio: "1 / 1", background: isLt ? "#e8e8e8" : "#111", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div onClick={() => photo.url && setLightbox(photo.url)} style={{ background: isLt ? "#e8e8e8" : "#111", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: photo.url ? "zoom-in" : "default" }}>
                     {photo.url
-                      ? <img src={photo.url} alt={photo.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ? <img src={photo.url} alt={photo.label} style={{ width: "100%", height: "auto", display: "block" }} />
                       : <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="0.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                     }
                   </div>
                   <div style={{ padding: "8px 10px 10px", background: isLt ? "#f4f4f4" : "#0e0e0e" }}>
-                    <p style={{ ...lbl, fontSize: "0.54rem" }}>{photo.label}</p>
+                    {isArtist && editingLabel?.type === "photo" && editingLabel.idx === i ? (
+                      <input
+                        autoFocus
+                        value={editingLabelVal}
+                        onChange={e => setEditingLabelVal(e.target.value)}
+                        onBlur={saveLabel}
+                        onKeyDown={e => { if (e.key === "Enter") saveLabel(); if (e.key === "Escape") setEditingLabel(null); }}
+                        style={{ ...lbl, fontSize: "0.54rem", background: "transparent", border: "none", borderBottom: `1px solid ${tokens.accent}`, outline: "none", color: tokens.text, width: "100%", padding: "0 0 2px" }}
+                      />
+                    ) : (
+                      <p
+                        onClick={() => isArtist && (setEditingLabel({ type: "photo", idx: i }), setEditingLabelVal(photo.label))}
+                        style={{ ...lbl, fontSize: "0.54rem", cursor: isArtist ? "text" : "default" }}
+                        title={isArtist ? "Click to edit" : undefined}
+                      >{photo.label}</p>
+                    )}
                     {photo.url && <a href={photo.url} download style={{ ...lbl, color: tokens.accent, textDecoration: "none", display: "block", marginTop: "0.25rem" }}>Download ↓</a>}
                   </div>
                 </div>
@@ -163,14 +201,29 @@ export default function PhotoSection({ profile, tokens, isArtist, onUpdate, supa
                 {isArtist && (
                   <button onClick={() => handleDeletePoster(i)} style={{ position: "absolute", top: 6, right: 6, zIndex: 10, background: "rgba(0,0,0,0.6)", color: "#d95c5c", border: "none", borderRadius: 3, padding: "2px 7px", fontSize: "0.65rem", cursor: "pointer", fontFamily: "Inter, sans-serif" }}>✕</button>
                 )}
-                <div style={{ aspectRatio: "2 / 3", background: isLt ? "#e8e8e8" : "#111", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div onClick={() => poster.url && setLightbox(poster.url)} style={{ aspectRatio: "2 / 3", background: isLt ? "#e8e8e8" : "#111", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", cursor: poster.url ? "zoom-in" : "default" }}>
                   {poster.url
                     ? <img src={poster.url} alt={poster.label} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     : <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="0.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                   }
                 </div>
                 <div style={{ padding: "8px 10px 10px", background: isLt ? "#f4f4f4" : "#0e0e0e" }}>
-                  <p style={{ ...lbl, fontSize: "0.54rem" }}>{poster.label}</p>
+                  {isArtist && editingLabel?.type === "poster" && editingLabel.idx === i ? (
+                    <input
+                      autoFocus
+                      value={editingLabelVal}
+                      onChange={e => setEditingLabelVal(e.target.value)}
+                      onBlur={saveLabel}
+                      onKeyDown={e => { if (e.key === "Enter") saveLabel(); if (e.key === "Escape") setEditingLabel(null); }}
+                      style={{ ...lbl, fontSize: "0.54rem", background: "transparent", border: "none", borderBottom: `1px solid ${tokens.accent}`, outline: "none", color: tokens.text, width: "100%", padding: "0 0 2px" }}
+                    />
+                  ) : (
+                    <p
+                      onClick={() => isArtist && (setEditingLabel({ type: "poster", idx: i }), setEditingLabelVal(poster.label))}
+                      style={{ ...lbl, fontSize: "0.54rem", cursor: isArtist ? "text" : "default" }}
+                      title={isArtist ? "Click to edit" : undefined}
+                    >{poster.label}</p>
+                  )}
                   {poster.venue && <p style={{ ...lbl, fontSize: "0.5rem", color: tokens.muted2, marginTop: "0.15rem" }}>{poster.venue}</p>}
                   {poster.showDate && <p style={{ ...lbl, fontSize: "0.5rem", color: tokens.muted2 }}>{poster.showDate}</p>}
                   {poster.url && <a href={poster.url} download style={{ ...lbl, color: tokens.accent, textDecoration: "none", display: "block", marginTop: "0.25rem" }}>Download ↓</a>}

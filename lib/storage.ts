@@ -3,7 +3,7 @@ import { supabase } from "./supabase";
 export async function uploadBandImage(
   slug: string,
   file: File,
-  folder: "cover" | "profile" | "photos" | "posters" = "photos"
+  folder: "cover" | "profile" | "photos" | "posters" | "gear" = "photos"
 ): Promise<string> {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${slug}/${folder}/${Date.now()}.${ext}`;

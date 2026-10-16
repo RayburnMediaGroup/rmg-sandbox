@@ -30,12 +30,14 @@ export default function WaitlistPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const canSubmit = firstName.trim() && lastName.trim() && email.includes("@") && password.length >= 8;
+  const emailsMatch = email.trim().toLowerCase() === confirmEmail.trim().toLowerCase();
+  const canSubmit = firstName.trim() && lastName.trim() && email.includes("@") && confirmEmail && emailsMatch && password.length >= 8;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -204,6 +206,22 @@ export default function WaitlistPage() {
                 style={inputStyle}
                 required
               />
+            </div>
+
+            <div style={{ marginTop: "1.75rem" }}>
+              <label style={{ ...T, fontSize: "0.58rem", letterSpacing: "0.16em", textTransform: "uppercase", color: confirmEmail && !emailsMatch ? "#d95c5c" : GOLD_DIM, display: "block" }}>Confirm Email</label>
+              <input
+                type="email"
+                value={confirmEmail}
+                onChange={e => setConfirmEmail(e.target.value)}
+                placeholder="re-enter your email"
+                autoComplete="off"
+                style={{ ...inputStyle, borderBottomColor: confirmEmail && !emailsMatch ? "#d95c5c" : undefined }}
+                required
+              />
+              {confirmEmail && !emailsMatch && (
+                <p style={{ ...T, fontSize: "0.68rem", color: "#d95c5c", marginTop: "0.4rem" }}>emails don't match</p>
+              )}
             </div>
 
             <div style={{ marginTop: "1.75rem", position: "relative" }}>

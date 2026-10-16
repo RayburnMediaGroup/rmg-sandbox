@@ -606,7 +606,7 @@ export const showHistory: Show[] = [
 //  GEAR
 // ─────────────────────────────────────────────
 
-export interface GearItem { category: string; name: string; detail?: string; }
+export interface GearItem { category: string; name: string; detail?: string; imageUrl?: string; endorsed?: boolean; backlineRequired?: boolean; }
 export interface MemberGear { member: string; role: string; gear: GearItem[]; }
 
 export const gear: MemberGear[] = [

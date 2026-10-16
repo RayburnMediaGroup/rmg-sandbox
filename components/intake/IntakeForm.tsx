@@ -447,11 +447,12 @@ export default function IntakeForm() {
         input::placeholder, textarea::placeholder { color: #666; }
         select option { background: #161616; color: #d8d8d8; }
         @keyframes breathe { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.5);opacity:1} }
+        @keyframes intakeSlide { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
       `}</style>
 
       {/* Progress bar */}
-      <div style={{ height: 2, background: "rgba(255,255,255,0.08)", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
-        <div style={{ height: "100%", background: GOLD, width: `${((step + 1) / STEPS.length) * 100}%`, transition: "width 0.3s ease" }} />
+      <div style={{ height: 3, background: "rgba(255,255,255,0.06)", position: "fixed", top: 0, left: 0, right: 0, zIndex: 100 }}>
+        <div style={{ height: "100%", background: `linear-gradient(90deg, ${GOLD}aa, ${GOLD})`, width: `${((step + 1) / STEPS.length) * 100}%`, transition: "width 0.4s ease", boxShadow: `0 0 8px ${GOLD}88` }} />
       </div>
 
       {/* Header */}
@@ -464,16 +465,16 @@ export default function IntakeForm() {
         }}>
           bandwidth
         </p>
-        <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           {STEPS.map((s, i) => (
-            <div key={s.id} style={{ width: 6, height: 6, borderRadius: "50%", background: i <= step ? GOLD : "rgba(255,255,255,0.2)", transition: "background 0.2s" }} />
+            <div key={s.id} title={s.label} style={{ width: i === step ? 20 : 7, height: 7, borderRadius: 4, background: i < step ? GOLD : i === step ? GOLD : "rgba(255,255,255,0.15)", transition: "all 0.3s ease", opacity: i > step ? 0.5 : 1 }} />
           ))}
         </div>
       </div>
 
       {/* Form body */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "3rem 1.5rem" }}>
-        <div style={{ width: "100%", maxWidth: 560 }}>
+        <div key={step} style={{ width: "100%", maxWidth: 560, animation: "intakeSlide 0.3s ease" }}>
 
           {/* Step label */}
           <p style={{ ...T, fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD_DIM, marginBottom: "1.5rem", fontWeight: 500 }}>

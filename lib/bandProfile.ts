@@ -76,9 +76,10 @@ export interface ProfileData {
   amazonMusic?: string; soundcloud?: string; bandcamp?: string;
   website?: string; epk?: string; merch?: string; label?: string;
   managerName?: string; managerEmail?: string; agentName?: string; agentEmail?: string;
-  heroImage: string; coverImage?: string; albumArt: string;
+  heroImage: string; coverImage?: string; albumArt: string; pressPhoto?: string;
   colorMode: "dark" | "light";
   colorTheme?: string;
+  founderBadge?: boolean;
   merchUrl?: string;
   pressQuotes?: { quote: string; source: string; year?: number }[];
   awards?: string[];

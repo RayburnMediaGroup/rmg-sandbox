@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function VerifiedPage() {
   const inserted = useRef(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (inserted.current) return;
@@ -24,6 +26,7 @@ export default function VerifiedPage() {
             inserted.current = true;
             subscription.unsubscribe();
             await upsertWaitlist(newSession.user);
+            await redirectToBandPage(newSession.user.id);
           }
         });
         return;
@@ -32,6 +35,16 @@ export default function VerifiedPage() {
       if (inserted.current) return;
       inserted.current = true;
       await upsertWaitlist(session.user);
+      await redirectToBandPage(session.user.id);
+    }
+
+    async function redirectToBandPage(userId: string) {
+      const { data: band } = await supabase.from("bands").select("slug").eq("user_id", userId).maybeSingle();
+      if (band?.slug) {
+        router.push(`/bandstack/${band.slug}`);
+      } else {
+        router.push("/intake");
+      }
     }
 
     async function upsertWaitlist(user: { id: string; email?: string; user_metadata?: Record<string, string> }) {
@@ -45,7 +58,7 @@ export default function VerifiedPage() {
     }
 
     writeWaitlist();
-  }, []);
+  }, [router]);
 
   return (
     <div style={{
@@ -70,12 +83,14 @@ export default function VerifiedPage() {
           animation: "breathe 2.8s ease-in-out infinite",
         }} />
         <p style={{ fontSize: "2.2rem", fontWeight: 300, color: "#d8d8d8", marginBottom: "0.75rem", letterSpacing: "0.01em" }}>
-          you&apos;re confirmed.
+          setting up your account…
         </p>
         <p style={{ fontSize: "1.1rem", color: "#888", fontWeight: 300, lineHeight: 1.9, maxWidth: 400, textAlign: "center" }}>
-          your spot is reserved.<br />
-          we&apos;ll be in touch when access opens.
+          you&apos;re in. taking you to your page builder now.
         </p>
+        <a href="/intake" style={{ display: "inline-block", marginTop: "2rem", fontSize: "0.75rem", color: "#d4a843", fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "0.12em", textTransform: "uppercase", textDecoration: "none" }}>
+          click here if not redirected →
+        </a>
         <p style={{
           fontFamily: "'Playfair Display', Georgia, serif",
           fontStyle: "italic",

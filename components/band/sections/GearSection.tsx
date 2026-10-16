@@ -4,12 +4,13 @@ import { useState } from "react";
 import type { ProfileData } from "@/lib/bandProfile";
 import type { TokenSet } from "@/lib/genreTokens";
 import { useMobile } from "@/lib/useMobile";
+import { uploadBandImage } from "@/lib/storage";
 
-interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; }
+interface Props { profile: ProfileData; tokens: TokenSet; isArtist?: boolean; onUpdate?: (u: Partial<ProfileData>) => void; supabaseSlug?: string; }
 
 interface AddState { category: string; name: string; detail: string; }
 
-export default function GearSection({ profile, tokens, isArtist, onUpdate }: Props) {
+export default function GearSection({ profile, tokens, isArtist, onUpdate, supabaseSlug }: Props) {
   const isMobile = useMobile();
   const isLt = profile.colorMode === "light";
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
@@ -25,6 +26,8 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
   const [newMemberRole, setNewMemberRole] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [addNameError, setAddNameError] = useState(false);
+  const [lightbox, setLightbox] = useState<string | null>(null);
 
   const memberData = gearData.find(g => g.member === activeMember);
   const categories = memberData ? [...new Set(memberData.gear.map(g => g.category))] : [];
@@ -59,7 +62,7 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
   }
 
   function commitAdd() {
-    if (!adding?.name.trim()) { setAdding(null); return; }
+    if (!adding?.name.trim()) { setAddNameError(true); return; }
     const nextGear = [...gearData];
     const mIdx = nextGear.findIndex(g => g.member === activeMember);
     if (mIdx < 0) { setAdding(null); return; }
@@ -69,10 +72,17 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
     };
     onUpdate?.({ gear: nextGear });
     setAdding(null);
+    setAddNameError(false);
   }
 
   return (
     <section id="gear" style={{ borderBottom: border1 }}>
+      {/* Lightbox */}
+      {lightbox && (
+        <div onClick={() => setLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.88)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}>
+          <img src={lightbox} alt="Gear" style={{ maxWidth: "90vw", maxHeight: "85vh", objectFit: "contain", borderRadius: 8, boxShadow: "0 8px 48px rgba(0,0,0,0.8)" }} />
+        </div>
+      )}
       <div style={{ maxWidth: 860, margin: "0 auto", padding: isMobile ? "32px 16px" : "48px 40px" }}>
 
         <p className="section-label" style={{ marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1 }}>Gear List</p>
@@ -134,8 +144,8 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
               <div style={{ background: isLt ? "#f4f4f4" : "#111", border: `1px solid ${tokens.accent}44`, borderRadius: 8, padding: "16px 18px" }}>
                 <p style={{ ...lbl, color: tokens.accent, marginBottom: "0.6rem" }}>{adding.category}</p>
                 <div style={{ marginTop: "0.75rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                  <input autoFocus value={adding.name} onChange={e => setAdding({ ...adding, name: e.target.value })} placeholder="Gear name" style={inputStyle} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") setAdding(null); }} />
-                  <input value={adding.detail} onChange={e => setAdding({ ...adding, detail: e.target.value })} placeholder="Detail (optional)" style={inputStyle} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") setAdding(null); }} />
+                  <input autoFocus value={adding.name} onChange={e => { setAdding({ ...adding, name: e.target.value }); setAddNameError(false); }} placeholder="Gear name — required" style={{ ...inputStyle, borderColor: addNameError ? "#d95c5c" : undefined }} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") { setAdding(null); setAddNameError(false); } }} />
+                  <input value={adding.detail} onChange={e => setAdding({ ...adding, detail: e.target.value })} placeholder="Detail (optional)" style={inputStyle} onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") { setAdding(null); setAddNameError(false); } }} />
                   <div style={{ display: "flex", gap: "0.4rem" }}>
                     <button onClick={commitAdd} style={{ ...lbl, flex: 1, background: tokens.accent, color: isLt ? "#fff" : "#000", border: "none", borderRadius: 3, padding: "5px 0", cursor: "pointer" }}>Add</button>
                     <button onClick={() => setAdding(null)} style={{ ...lbl, flex: 1, background: "transparent", color: tokens.muted2, border: border2, borderRadius: 3, padding: "5px 0", cursor: "pointer" }}>Cancel</button>
@@ -152,59 +162,116 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
                   {items.map((item, itemIdx) => {
                     const globalGearIdx = memberData.gear.indexOf(item);
                     return (
-                      <div key={itemIdx} style={{ padding: "7px 0", borderBottom: border2, display: "flex", alignItems: "flex-start", gap: "0.4rem" }}>
-                        <div style={{ flex: 1 }}>
-                          {isArtist ? (
-                            <>
-                              <input
-                                defaultValue={item.name}
-                                placeholder="Gear name"
-                                onBlur={e => {
-                                  const v = e.target.value.trim();
-                                  if (!v || v === item.name) return;
-                                  const nextGear = [...gearData];
-                                  const mIdx = nextGear.findIndex(g => g.member === activeMember);
-                                  if (mIdx < 0) return;
-                                  const newItems = [...nextGear[mIdx].gear];
-                                  newItems[globalGearIdx] = { ...newItems[globalGearIdx], name: v };
-                                  nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
-                                  onUpdate?.({ gear: nextGear });
-                                }}
-                                style={{ ...inputStyle, fontWeight: 500, marginBottom: "0.2rem" }}
-                              />
-                              <input
-                                defaultValue={item.detail ?? ""}
-                                placeholder="Detail (optional)"
-                                onBlur={e => {
-                                  const v = e.target.value.trim();
-                                  if (v === (item.detail ?? "")) return;
-                                  const nextGear = [...gearData];
-                                  const mIdx = nextGear.findIndex(g => g.member === activeMember);
-                                  if (mIdx < 0) return;
-                                  const newItems = [...nextGear[mIdx].gear];
-                                  newItems[globalGearIdx] = { ...newItems[globalGearIdx], detail: v || undefined };
-                                  nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
-                                  onUpdate?.({ gear: nextGear });
-                                }}
-                                style={{ ...inputStyle, fontSize: "0.7rem" }}
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <p style={{ ...T, fontSize: "0.82rem", fontWeight: 500, color: tokens.text }}>{item.name}</p>
-                              {item.detail && <p style={{ ...lbl, marginTop: "0.1rem", color: tokens.muted2 }}>{item.detail}</p>}
-                            </>
+                      <div key={itemIdx} style={{ padding: "10px 0", borderBottom: border2 }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                          {/* Gear image */}
+                          <div style={{ flexShrink: 0, width: 56, height: 56, borderRadius: 6, overflow: "visible", position: "relative" }}>
+                            <div style={{ width: 56, height: 56, borderRadius: 6, overflow: "hidden", background: isLt ? "#e0e0e0" : "#1a1a1a", border: border2, display: "flex", alignItems: "center", justifyContent: "center", cursor: item.imageUrl ? "zoom-in" : "default" }}
+                              onClick={() => item.imageUrl && setLightbox(item.imageUrl)}>
+                              {item.imageUrl
+                                ? <img src={item.imageUrl} alt={item.name} style={{ width: "100%", height: "100%", objectFit: "cover", pointerEvents: "none" }} />
+                                : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                              }
+                            </div>
+                            {isArtist && (
+                              <label style={{ position: "absolute", bottom: -6, right: -6, width: 18, height: 18, borderRadius: "50%", background: tokens.accent, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "0.55rem", boxShadow: "0 1px 4px rgba(0,0,0,0.5)", zIndex: 2 }} title="Upload photo">
+                                📷
+                                <input type="file" accept="image/*" style={{ display: "none" }} onChange={async e => {
+                                  const file = e.target.files?.[0]; if (!file) return;
+                                  const slug = supabaseSlug ?? "template";
+                                  try {
+                                    const url = await uploadBandImage(slug, file, "gear");
+                                    const nextGear = [...gearData];
+                                    const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                    if (mIdx < 0) return;
+                                    const newItems = [...nextGear[mIdx].gear];
+                                    newItems[globalGearIdx] = { ...newItems[globalGearIdx], imageUrl: url };
+                                    nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                    onUpdate?.({ gear: nextGear });
+                                  } catch {}
+                                }} />
+                              </label>
+                            )}
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            {isArtist ? (
+                              <>
+                                <input
+                                  defaultValue={item.name}
+                                  placeholder="Gear name"
+                                  onBlur={e => {
+                                    const v = e.target.value.trim();
+                                    if (!v || v === item.name) return;
+                                    const nextGear = [...gearData];
+                                    const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                    if (mIdx < 0) return;
+                                    const newItems = [...nextGear[mIdx].gear];
+                                    newItems[globalGearIdx] = { ...newItems[globalGearIdx], name: v };
+                                    nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                    onUpdate?.({ gear: nextGear });
+                                  }}
+                                  style={{ ...inputStyle, fontWeight: 500, marginBottom: "0.2rem" }}
+                                />
+                                <input
+                                  defaultValue={item.detail ?? ""}
+                                  placeholder="Detail (optional)"
+                                  onBlur={e => {
+                                    const v = e.target.value.trim();
+                                    if (v === (item.detail ?? "")) return;
+                                    const nextGear = [...gearData];
+                                    const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                    if (mIdx < 0) return;
+                                    const newItems = [...nextGear[mIdx].gear];
+                                    newItems[globalGearIdx] = { ...newItems[globalGearIdx], detail: v || undefined };
+                                    nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                    onUpdate?.({ gear: nextGear });
+                                  }}
+                                  style={{ ...inputStyle, fontSize: "0.7rem", marginBottom: "0.3rem" }}
+                                />
+                                {/* Endorsed + Backline toggles */}
+                                <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                                  {(["endorsed", "backlineRequired"] as const).map(flag => {
+                                    const active = !!item[flag];
+                                    const label = flag === "endorsed" ? "⭐ Endorsed" : "🎸 Backline Need";
+                                    return (
+                                      <button key={flag} onClick={() => {
+                                        const nextGear = [...gearData];
+                                        const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                                        if (mIdx < 0) return;
+                                        const newItems = [...nextGear[mIdx].gear];
+                                        newItems[globalGearIdx] = { ...newItems[globalGearIdx], [flag]: !active };
+                                        nextGear[mIdx] = { ...nextGear[mIdx], gear: newItems };
+                                        onUpdate?.({ gear: nextGear });
+                                      }} style={{ ...lbl, fontSize: "0.5rem", background: active ? (flag === "endorsed" ? "#c8922a33" : tokens.accent + "22") : "transparent", border: `1px solid ${active ? (flag === "endorsed" ? "#c8922a" : tokens.accent) : tokens.border2}`, borderRadius: 3, color: active ? (flag === "endorsed" ? "#c8922a" : tokens.accent) : tokens.muted2, padding: "2px 7px", cursor: "pointer" }}>
+                                        {label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
+                                  <p style={{ ...T, fontSize: "0.82rem", fontWeight: 500, color: tokens.text }}>{item.name}</p>
+                                  {item.endorsed && <span style={{ ...lbl, fontSize: "0.48rem", color: "#c8922a", border: "1px solid #c8922a55", borderRadius: 3, padding: "1px 5px" }}>⭐ Endorsed</span>}
+                                  {item.backlineRequired && <span style={{ ...lbl, fontSize: "0.48rem", color: tokens.accent, border: `1px solid ${tokens.accent}55`, borderRadius: 3, padding: "1px 5px" }}>🎸 Backline</span>}
+                                </div>
+                                {item.detail && <p style={{ ...lbl, marginTop: "0.1rem", color: tokens.muted2 }}>{item.detail}</p>}
+                              </>
+                            )}
+                          </div>
+
+                          {isArtist && (
+                            <button onClick={() => {
+                              const nextGear = [...gearData];
+                              const mIdx = nextGear.findIndex(g => g.member === activeMember);
+                              if (mIdx < 0) return;
+                              nextGear[mIdx] = { ...nextGear[mIdx], gear: nextGear[mIdx].gear.filter((_, gi) => gi !== globalGearIdx) };
+                              onUpdate?.({ gear: nextGear });
+                            }} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: "2px 4px", ...T, flexShrink: 0 }}>✕</button>
                           )}
                         </div>
-                        {isArtist && (
-                          <button onClick={() => {
-                            const nextGear = [...gearData];
-                            const mIdx = nextGear.findIndex(g => g.member === activeMember);
-                            if (mIdx < 0) return;
-                            nextGear[mIdx] = { ...nextGear[mIdx], gear: nextGear[mIdx].gear.filter((_, gi) => gi !== globalGearIdx) };
-                            onUpdate?.({ gear: nextGear });
-                          }} style={{ background: "transparent", border: "none", color: "#d95c5c", cursor: "pointer", fontSize: "0.65rem", padding: "2px 4px", ...T, flexShrink: 0 }}>✕</button>
-                        )}
                       </div>
                     );
                   })}
@@ -215,10 +282,10 @@ export default function GearSection({ profile, tokens, isArtist, onUpdate }: Pro
                         <input
                           autoFocus
                           value={adding.name}
-                          onChange={e => setAdding({ ...adding, name: e.target.value })}
-                          placeholder="Gear name"
-                          style={inputStyle}
-                          onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") setAdding(null); }}
+                          onChange={e => { setAdding({ ...adding, name: e.target.value }); setAddNameError(false); }}
+                          placeholder="Gear name — required"
+                          style={{ ...inputStyle, borderColor: addNameError ? "#d95c5c" : undefined }}
+                          onKeyDown={e => { if (e.key === "Enter") commitAdd(); if (e.key === "Escape") { setAdding(null); setAddNameError(false); } }}
                         />
                         <input
                           value={adding.detail}

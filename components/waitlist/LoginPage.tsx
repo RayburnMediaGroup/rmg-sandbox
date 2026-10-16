@@ -50,22 +50,17 @@ export default function LoginPage() {
       return;
     }
 
-    // Check invited status via server API (bypasses RLS)
-    const res = await fetch("/api/check-invited", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: data.user.id, email: data.user.email }),
-    });
-    const { invited, slug } = await res.json();
+    // Look up their band slug directly
+    const { data: band } = await supabase
+      .from("bands")
+      .select("slug")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
 
-    if (invited) {
-      if (slug) {
-        router.push(`/bandstack/${slug}`);
-      } else {
-        router.push("/intake");
-      }
+    if (band?.slug) {
+      router.push(`/bandstack/${band.slug}`);
     } else {
-      router.push("/waiting");
+      router.push("/intake");
     }
   }
 
@@ -74,7 +69,7 @@ export default function LoginPage() {
       height: "100vh",
       minHeight: 600,
       backgroundColor: "#080808",
-      backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.88) 0%, rgba(8,8,8,0.80) 40%, rgba(8,8,8,0.85) 70%, rgba(8,8,8,0.96) 100%), url('/red-rocks-hero.jpg')",
+      backgroundImage: "linear-gradient(to bottom, rgba(8,8,8,0.55) 0%, rgba(8,8,8,0.45) 40%, rgba(8,8,8,0.60) 70%, rgba(8,8,8,0.80) 100%), url('/red-rocks-hero.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center 30%",
       backgroundRepeat: "no-repeat",

@@ -112,11 +112,12 @@ function migratePosition(p: any): StagePosition {
 
 interface Props {
   artistKey: string;
+  slug?: string;
   backHref: string;
   viewHref: string;
 }
 
-export default function StagePlotEditor({ artistKey, backHref, viewHref }: Props) {
+export default function StagePlotEditor({ artistKey, slug, backHref, viewHref }: Props) {
   const PLOT_KEY = PLOT_KEY_PREFIX + artistKey;
 
   const [data, setData] = useState<StagePlotData>(EMPTY_PLOT);
@@ -128,28 +129,62 @@ export default function StagePlotEditor({ artistKey, backHref, viewHref }: Props
   const dragIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    try {
-      // One-time migration: copy legacy unscoped key into scoped key on first load
-      const LEGACY_KEY = "bandstack-stage-plot-v5";
-      if (!localStorage.getItem(PLOT_KEY) && localStorage.getItem(LEGACY_KEY)) {
-        localStorage.setItem(PLOT_KEY, localStorage.getItem(LEGACY_KEY)!);
+    async function load() {
+      // Try Supabase first if slug provided
+      if (slug) {
+        try {
+          const { supabase } = await import("@/lib/supabase");
+          const { data: row } = await supabase.from("bands").select("profile").eq("slug", slug).maybeSingle();
+          const stagePlot = (row?.profile as any)?.stagePlot;
+          if (stagePlot) {
+            const positions = (stagePlot.positions ?? []).map(migratePosition);
+            const next: StagePlotData = { ...EMPTY_PLOT, ...stagePlot, positions };
+            setData(next);
+            if (positions.length) setSelectedId(positions[0].id);
+            return;
+          }
+        } catch {}
       }
-      const raw = localStorage.getItem(PLOT_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as any;
-        const positions = (parsed.positions ?? []).map(migratePosition);
-        const next: StagePlotData = { ...EMPTY_PLOT, ...parsed, positions };
-        setData(next);
-        if (positions.length) setSelectedId(positions[0].id);
-      }
-    } catch {}
-  }, [PLOT_KEY]);
+      // Fall back to localStorage
+      try {
+        const LEGACY_KEY = "bandstack-stage-plot-v5";
+        if (!localStorage.getItem(PLOT_KEY) && localStorage.getItem(LEGACY_KEY)) {
+          localStorage.setItem(PLOT_KEY, localStorage.getItem(LEGACY_KEY)!);
+        }
+        const raw = localStorage.getItem(PLOT_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as any;
+          const positions = (parsed.positions ?? []).map(migratePosition);
+          const next: StagePlotData = { ...EMPTY_PLOT, ...parsed, positions };
+          setData(next);
+          if (positions.length) setSelectedId(positions[0].id);
+        }
+      } catch {}
+    }
+    load();
+  }, [PLOT_KEY, slug]);
 
   // ── Persistence ──────────────────────────────────────────────────────────────
 
   const save = (next: StagePlotData) => {
     setData(next);
     try { localStorage.setItem(PLOT_KEY, JSON.stringify(next)); } catch {}
+    // Also save to Supabase if slug provided
+    if (slug) {
+      import("@/lib/supabase").then(({ supabase }) => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (!session) return;
+          supabase.from("bands")
+            .select("profile")
+            .eq("slug", slug)
+            .maybeSingle()
+            .then(({ data: row }) => {
+              const profile = { ...(row?.profile as object ?? {}), stagePlot: next };
+              supabase.from("bands").update({ profile }).eq("slug", slug).eq("user_id", session.user.id).then(() => {});
+            });
+        });
+      });
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
   };

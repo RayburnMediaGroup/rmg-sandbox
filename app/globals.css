@@ -111,6 +111,12 @@ body {
   section { break-inside: avoid; }
 }
 
+/* ─── Shared animations ──────────────────────────────────────── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── Hide scrollbars on mobile nav strips ───────────────────── */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+
 /* ─── Horizontal scroll strips ───────────────────────────────── */
 .overflow-x-auto {
   padding-top: 8px;

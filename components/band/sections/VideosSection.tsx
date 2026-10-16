@@ -18,7 +18,7 @@ function VideoCard({ v, tokens, isLt, onDelete }: { v: ProfileVideo; tokens: Tok
   const [playing, setPlaying] = useState(false);
   const T: React.CSSProperties = { fontFamily: "Inter, system-ui, sans-serif" };
   const border1 = `1px solid ${tokens.border}`;
-  const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/maxresdefault.jpg`;
+  const thumb = `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`;
 
   return (
     <div style={{ background: isLt ? "#f0f0f0" : "#111", borderRadius: 8, overflow: "hidden", border: border1, position: "relative" }}>

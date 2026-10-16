@@ -2,7 +2,7 @@
   transition: color 0.12s ease, background 0.12s ease;
 }
 
-.tab:hover {
+.tab:not([data-active="true"]):hover {
   color: #ffffff !important;
   background: rgba(255, 255, 255, 0.12) !important;
 }

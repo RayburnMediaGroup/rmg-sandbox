@@ -120,12 +120,21 @@ export default function VenueCRMSection({ profile, tokens, onUpdate }: Props) {
       <div style={{ maxWidth: 860, margin: "0 auto", padding: isMobile ? "32px 16px" : "48px 40px" }}>
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "1.5rem", paddingBottom: "0.75rem", borderBottom: border1 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "1rem", paddingBottom: "0.75rem", borderBottom: border1 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <p className="section-label">Venue CRM</p>
             <span style={{ ...lbl, fontSize: "0.46rem", color: tokens.accent, border: `1px solid ${tokens.accent}`, borderRadius: 3, padding: "1px 5px" }}>Artist Only</span>
           </div>
           <button onClick={() => setShowAddVenue(v => !v)} style={{ background: "transparent", border: `1px dashed ${tokens.accent}55`, borderRadius: 4, color: tokens.accent, fontSize: "0.68rem", padding: "4px 10px", cursor: "pointer", ...T }}>+ Add Venue</button>
+        </div>
+
+        {/* Private access notice */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", background: isLt ? "#f0f0f0" : "#111", border: `1px solid ${tokens.border}`, borderLeft: `3px solid ${tokens.accent}`, borderRadius: 6, padding: "10px 14px", marginBottom: "1.5rem" }}>
+          <span style={{ fontSize: "0.9rem" }}>🔒</span>
+          <p style={{ ...T, fontSize: "0.75rem", color: tokens.muted, lineHeight: 1.5 }}>
+            <strong style={{ color: tokens.text, fontWeight: 600 }}>This section is private to you as the artist.</strong>{" "}
+            Venue contacts, booking history, and show data are never visible to fans or the public — only logged-in artists and their management team can access this view.
+          </p>
         </div>
 
         {/* Stats row */}

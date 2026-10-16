@@ -91,7 +91,9 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
               )}
               {isArtist
                 ? <EditField value={profile.bio} onSave={v => onUpdate?.({ bio: v })} multiline placeholder="Band bio…" accentColor={tokens.accent} style={{ ...editorial, width: "100%" }} />
-                : profile.bio && (() => {
+                : !profile.bio ? (
+                  <p style={{ fontFamily: "Inter, system-ui, sans-serif", fontSize: "0.8rem", color: tokens.muted2, fontStyle: "italic", lineHeight: 1.7 }}>Bio coming soon.</p>
+                ) : (() => {
                     const bio = profile.bio;
                     const name = profile.name ?? "";
                     const startsWithName = name && bio.startsWith(name);
@@ -164,6 +166,18 @@ export default function AboutSection({ profile, tokens, isArtist, onUpdate, stag
                       <button onClick={addAward} style={{ ...addBtn, marginTop: 0 }}>Add</button>
                     </div>
                   : <button onClick={() => setAddingAward(true)} style={addBtn}>+ Add Award</button>
+              )}
+
+              {/* Influences */}
+              {(profile.influences ?? []).length > 0 && (
+                <div style={{ marginTop: "1.5rem" }}>
+                  <p className="section-label" style={{ marginBottom: "0.6rem", paddingBottom: "0.4rem", borderBottom: border1 }}>Influences</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+                    {(profile.influences ?? []).map((inf, i) => (
+                      <span key={i} style={{ ...lbl, fontSize: "0.6rem", background: tokens.accent + "14", border: `1px solid ${tokens.accent}44`, borderRadius: 4, color: tokens.accent, padding: "3px 10px" }}>{inf}</span>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           </div>

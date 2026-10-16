@@ -94,12 +94,13 @@ function migratePosition(p: any): StagePosition {
 
 interface Props {
   artistKey: string;
+  slug?: string;
   editHref: string;
   backHref?: string;
   showEditButton?: boolean;
 }
 
-export default function StagePlotView({ artistKey, editHref, backHref, showEditButton }: Props) {
+export default function StagePlotView({ artistKey, slug, editHref, backHref, showEditButton }: Props) {
   const isMobile = useMobile();
 
   // All state starts empty — nothing pre-populated
@@ -108,30 +109,50 @@ export default function StagePlotView({ artistKey, editHref, backHref, showEditB
   const [selectedId, setSelectedId] = useState<string>("");
 
   useEffect(() => {
-    try {
-      // Profile: scoped key first, then legacy unscoped key for ryan-chrys compatibility
-      const profileKey = artistKey === "ryan-chrys"
-        ? PROFILE_KEY_PREFIX            // ryan-chrys uses legacy unscoped key
-        : `${PROFILE_KEY_PREFIX}-${artistKey}`;
-      const rawProfile = localStorage.getItem(profileKey);
-      if (rawProfile) setProfile(JSON.parse(rawProfile) as ArtistProfile);
+    async function load() {
+      // Try Supabase first if slug provided
+      if (slug) {
+        try {
+          const { supabase } = await import("@/lib/supabase");
+          const { data: row } = await supabase.from("bands").select("profile").eq("slug", slug).maybeSingle();
+          if (row?.profile) {
+            const p = row.profile as any;
+            if (p.name || p.genre) setProfile(p as ArtistProfile);
+            if (p.stagePlot) {
+              const positions = (p.stagePlot.positions ?? []).map(migratePosition);
+              const next: StagePlotData = { ...p.stagePlot, positions };
+              setPlot(next);
+              if (positions.length) setSelectedId(positions[0].id);
+              return;
+            }
+          }
+        } catch {}
+      }
+      // Fall back to localStorage
+      try {
+        const profileKey = artistKey === "ryan-chrys"
+          ? PROFILE_KEY_PREFIX
+          : `${PROFILE_KEY_PREFIX}-${artistKey}`;
+        const rawProfile = localStorage.getItem(profileKey);
+        if (rawProfile) setProfile(JSON.parse(rawProfile) as ArtistProfile);
 
-      // One-time migration: copy legacy unscoped key into scoped key on first load
-      const LEGACY_KEY = "bandstack-stage-plot-v5";
-      const plotKey = PLOT_KEY_PREFIX + artistKey;
-      if (!localStorage.getItem(plotKey) && localStorage.getItem(LEGACY_KEY)) {
-        localStorage.setItem(plotKey, localStorage.getItem(LEGACY_KEY)!);
-      }
-      const rawPlot = localStorage.getItem(plotKey);
-      if (rawPlot) {
-        const parsed = JSON.parse(rawPlot) as any;
-        const positions = (parsed.positions ?? []).map(migratePosition);
-        const next: StagePlotData = { ...parsed, positions };
-        setPlot(next);
-        if (positions.length) setSelectedId(positions[0].id);
-      }
-    } catch {}
-  }, [artistKey]);
+        const LEGACY_KEY = "bandstack-stage-plot-v5";
+        const plotKey = PLOT_KEY_PREFIX + artistKey;
+        if (!localStorage.getItem(plotKey) && localStorage.getItem(LEGACY_KEY)) {
+          localStorage.setItem(plotKey, localStorage.getItem(LEGACY_KEY)!);
+        }
+        const rawPlot = localStorage.getItem(plotKey);
+        if (rawPlot) {
+          const parsed = JSON.parse(rawPlot) as any;
+          const positions = (parsed.positions ?? []).map(migratePosition);
+          const next: StagePlotData = { ...parsed, positions };
+          setPlot(next);
+          if (positions.length) setSelectedId(positions[0].id);
+        }
+      } catch {}
+    }
+    load();
+  }, [artistKey, slug]);
 
   // Derive accent from genre (from what the band actually entered, not a fallback)
   const genre      = profile.genre ?? "";

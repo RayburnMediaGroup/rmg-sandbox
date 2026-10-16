@@ -7,21 +7,21 @@ import QRCode from "react-qr-code";
 import type { ProfileData } from "@/lib/bandProfile";
 
 const THEME_OPTIONS: { label: string; genre: string; accent: string }[] = [
-  { label: "Outlaw Country",    genre: "outlaw country", accent: "#c8922a" },
-  { label: "Country",           genre: "country",        accent: "#d4b84a" },
-  { label: "Americana",         genre: "americana",      accent: "#c87941" },
-  { label: "Rock",              genre: "rock",           accent: "#e84040" },
-  { label: "Indie",             genre: "indie",          accent: "#7b68ee" },
-  { label: "Folk",              genre: "folk",           accent: "#8fbc8f" },
-  { label: "Blues",             genre: "blues",          accent: "#4a90d9" },
-  { label: "Jazz",              genre: "jazz",           accent: "#d4a843" },
-  { label: "Soul",              genre: "soul",           accent: "#c85a9e" },
-  { label: "Hip-Hop",           genre: "hip-hop",        accent: "#ff6b35" },
-  { label: "Electronic",        genre: "electronic",     accent: "#00e5ff" },
-  { label: "Ambient",           genre: "ambient",        accent: "#7ec8c8" },
-  { label: "Metal",             genre: "metal",          accent: "#9b59b6" },
-  { label: "Punk",              genre: "punk",           accent: "#ff2d55" },
-  { label: "Alternative",       genre: "alternative",    accent: "#50fa7b" },
+  { label: "Amber",     genre: "outlaw country", accent: "#b8822a" },
+  { label: "Harvest",   genre: "country",        accent: "#bea43e" },
+  { label: "Rust",      genre: "americana",      accent: "#a83c26" },
+  { label: "Ember",     genre: "rock",           accent: "#c43636" },
+  { label: "Teal",      genre: "indie",          accent: "#529a96" },
+  { label: "Sage",      genre: "folk",           accent: "#7a9852" },
+  { label: "Denim",     genre: "blues",          accent: "#4070a0" },
+  { label: "Plum",      genre: "jazz",           accent: "#8e2a56" },
+  { label: "Mandarin",  genre: "soul",           accent: "#bc5626" },
+  { label: "Brass",     genre: "hip-hop",        accent: "#d4aa30" },
+  { label: "Aqua",      genre: "electronic",     accent: "#00aaaa" },
+  { label: "Cobalt",    genre: "ambient",        accent: "#5588ba" },
+  { label: "Garnet",    genre: "metal",          accent: "#ac1818" },
+  { label: "Scarlet",   genre: "punk",           accent: "#cc3040" },
+  { label: "Indigo",    genre: "alternative",    accent: "#6a58d4" },
 ];
 
 interface Props {
@@ -56,6 +56,18 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
 
   const [refVisits, setRefVisits] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [pageLinkCopied, setPageLinkCopied] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    try {
+      const key = `bs_welcomed_${supabaseSlug ?? profileKey}`;
+      if (!localStorage.getItem(key)) {
+        setShowWelcome(true);
+        localStorage.setItem(key, "1");
+      }
+    } catch {}
+  }, [supabaseSlug, profileKey]);
   const [slugInput, setSlugInput] = useState(supabaseSlug ?? "");
   const [slugStatus, setSlugStatus] = useState<"idle" | "checking" | "taken" | "saved" | "error">("idle");
   const [showSlugEdit, setShowSlugEdit] = useState(false);
@@ -127,6 +139,17 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
         borderLeft: "1px solid #1e1e1e", overflowY: "auto",
         display: "flex", flexDirection: "column",
       }}>
+        {/* Welcome message — shown once per artist */}
+        {showWelcome && (
+          <div style={{ margin: "1rem 1.5rem 0", padding: "14px 16px", borderRadius: 8, background: `${accentColor}18`, border: `1px solid ${accentColor}44`, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem", animation: "fadeUp 0.4s ease both" }}>
+            <div>
+              <p style={{ ...T, fontSize: "0.78rem", fontWeight: 600, color: accentColor, marginBottom: "0.25rem" }}>Welcome to bandwidth.</p>
+              <p style={{ ...T, fontSize: "0.72rem", color: "#888", fontWeight: 300, lineHeight: 1.6 }}>Your page is live. Start filling in your sections and share your link when you&apos;re ready.</p>
+            </div>
+            <button onClick={() => setShowWelcome(false)} style={{ background: "transparent", border: "none", color: "#555", fontSize: "1rem", cursor: "pointer", lineHeight: 1, flexShrink: 0, marginTop: "2px" }}>✕</button>
+          </div>
+        )}
+
         {/* Header */}
         <div style={{ padding: "1.25rem 1.5rem", borderBottom: "1px solid #1e1e1e", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, background: "#0e0e0e", zIndex: 1 }}>
           <div>
@@ -140,6 +163,20 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
         </div>
 
 
+        {/* Share button */}
+        {supabaseSlug && (
+          <div style={{ margin: "1rem 1.5rem 0", display: "flex", gap: "0.5rem" }}>
+            <button onClick={() => { navigator.clipboard.writeText(pageUrl); setPageLinkCopied(true); setTimeout(() => setPageLinkCopied(false), 2000); }}
+              style={{ ...T, flex: 1, background: pageLinkCopied ? accentColor : `${accentColor}22`, border: `1px solid ${accentColor}55`, borderRadius: 8, color: pageLinkCopied ? "#000" : accentColor, fontSize: "0.72rem", fontWeight: 700, padding: "12px 0", cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase", transition: "all 0.2s" }}>
+              {pageLinkCopied ? "✓ Link Copied!" : "⬆ Share Your Page"}
+            </button>
+            <a href={pageUrl} target="_blank" rel="noopener noreferrer"
+              style={{ ...T, display: "flex", alignItems: "center", padding: "12px 14px", background: "transparent", border: "1px solid #333", borderRadius: 8, color: "#666", fontSize: "0.72rem", fontWeight: 500, textDecoration: "none", whiteSpace: "nowrap" }}>
+              View →
+            </a>
+          </div>
+        )}
+
         {/* Change URL */}
         {supabaseSlug && (
           <div style={{ margin: "0.75rem 1.5rem 0", padding: "12px 14px", borderRadius: 8, background: "#111", border: "1px solid #1e1e1e" }}>
@@ -150,10 +187,16 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
                   /bandstack/<span style={{ color: "#888" }}>{supabaseSlug}</span>
                 </p>
               </div>
-              <button onClick={() => { setShowSlugEdit(v => !v); setSlugInput(supabaseSlug); setSlugStatus("idle"); }}
-                style={{ ...T, background: "transparent", border: "1px solid #333", borderRadius: 5, color: "#666", fontSize: "0.62rem", padding: "4px 10px", cursor: "pointer" }}>
-                {showSlugEdit ? "Cancel" : "Change"}
-              </button>
+              <div style={{ display: "flex", gap: "0.4rem" }}>
+                <button onClick={() => { navigator.clipboard.writeText(pageUrl); setPageLinkCopied(true); setTimeout(() => setPageLinkCopied(false), 2000); }}
+                  style={{ ...T, background: pageLinkCopied ? accentColor : "transparent", border: `1px solid ${pageLinkCopied ? accentColor : "#333"}`, borderRadius: 5, color: pageLinkCopied ? "#000" : accentColor, fontSize: "0.62rem", fontWeight: 600, padding: "4px 10px", cursor: "pointer", transition: "all 0.2s" }}>
+                  {pageLinkCopied ? "✓ Copied" : "Copy Link"}
+                </button>
+                <button onClick={() => { setShowSlugEdit(v => !v); setSlugInput(supabaseSlug); setSlugStatus("idle"); }}
+                  style={{ ...T, background: "transparent", border: "1px solid #333", borderRadius: 5, color: "#666", fontSize: "0.62rem", padding: "4px 10px", cursor: "pointer" }}>
+                  {showSlugEdit ? "Cancel" : "Change"}
+                </button>
+              </div>
             </div>
             {showSlugEdit && (
               <div style={{ marginTop: "0.65rem", display: "flex", gap: "0.4rem", alignItems: "center" }}>
@@ -204,7 +247,7 @@ export default function ArtistDashboard({ onClose, onLock, onUpdate, accentColor
               </select>
             </div>
             {profile.colorTheme && (
-              <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, background: THEME_OPTIONS.find(o => o.genre === profile.colorTheme)?.accent ?? accentColor, border: "2px solid #333" }} />
+              <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, background: accentColor, border: "2px solid #333" }} />
             )}
           </div>
           <p style={{ ...lbl, color: "#555", marginTop: "0.4rem", textTransform: "none", letterSpacing: 0, fontSize: "0.62rem" }}>Changes colors and fonts across your entire page instantly.</p>

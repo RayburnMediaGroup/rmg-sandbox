@@ -25,7 +25,8 @@ import GearSection       from "@/components/band/sections/GearSection";
 import TimelineSection   from "@/components/band/sections/TimelineSection";
 import PressSection      from "@/components/band/sections/PressSection";
 import StatsSection      from "@/components/band/sections/StatsSection";
-import VenueCRMSection   from "@/components/band/sections/VenueCRMSection";
+import VenueCRMSection    from "@/components/band/sections/VenueCRMSection";
+import VenueSearchSection from "@/components/band/sections/VenueSearchSection";
 import SyncSection       from "@/components/band/sections/SyncSection";
 import ResourcesSection  from "@/components/band/sections/ResourcesSection";
 import TicketsSection    from "@/components/band/sections/TicketsSection";
@@ -95,15 +96,9 @@ function MobileNav({ active, setActive, navPrimary, navPro, tokens, lbl, isLt, a
 
   return (
     <div style={{ padding: "10px 12px 6px", borderBottom: `1px solid ${tokens.border}` }}>
-      {/* Utility row */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.4rem", marginBottom: "8px" }}>
-        <button onClick={onShare} style={{ ...btnBase, color: tokens.muted2 }}>↗ Share</button>
-        {artistUnlocked && (
-          <button onClick={onDashboard} style={{ ...btnBase, background: accentColor + "22", borderColor: accentColor + "55", color: accentColor }}>⚡ Dashboard</button>
-        )}
-      </div>
-      {/* All tabs — one continuous wrapping row */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+      {/* Tabs row with utility buttons pinned right */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+        <div style={{ display: "flex", overflowX: "auto", gap: "0.35rem", flex: 1, paddingBottom: "4px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {navPrimary.map(n => (
           <button key={n.id} onClick={() => setActive(n.id)} style={{
             ...btnBase,
@@ -127,6 +122,14 @@ function MobileNav({ active, setActive, navPrimary, navPro, tokens, lbl, isLt, a
             color: active === "venue-crm" ? accentColor : tokens.muted,
           }}>Venue CRM</button>
         )}
+        </div>
+        {/* Utility buttons — small, pinned right */}
+        <div style={{ display: "flex", gap: "0.3rem", flexShrink: 0 }}>
+          <button onClick={onShare} style={{ ...btnBase, padding: "7px 8px", color: tokens.muted2, fontSize: "0.7rem" }}>↗</button>
+          {artistUnlocked && (
+            <button onClick={onDashboard} style={{ ...btnBase, padding: "7px 8px", background: accentColor + "22", borderColor: accentColor + "55", color: accentColor, fontSize: "0.7rem" }}>⚡</button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -152,6 +155,7 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
   const [showDashboard, setShowDashboard]   = useState(false);
   const [previewMode, setPreviewMode]       = useState(false);
   const [ctaHovered, setCtaHovered]         = useState<string | null>(null);
+  const [heroLightbox, setHeroLightbox]     = useState<string | null>(null);
   const supabaseSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function loadProfile(): ProfileData {
@@ -220,12 +224,13 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
     { id: "epk",          label: "EPK" },
     { id: "sync",         label: "Sync" },
     { id: "mailing-list", label: "Mailing List" },
-    { id: "resources",    label: "Resources" },
-    { id: "stage-plot",   label: "Stage Plot", href: stagePlotHref },
+    { id: "resources",      label: "Resources" },
+    { id: "venue-search",   label: "Find Venues" },
+    { id: "stage-plot",     label: "Stage Plot", href: stagePlotHref },
   ];
 
   return (
-    <main style={{ background: tokens.bg, minHeight: "100vh", color: tokens.text, ...T }}>
+    <main style={{ background: tokens.bg, minHeight: "100vh", color: tokens.text, ...T, position: "relative" }}>
 
       {/* Artist login link — only shown when not the owner */}
       {!artistUnlocked && (
@@ -256,11 +261,18 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
         </div>
       )}
 
+      {/* Hero lightbox */}
+      {heroLightbox && (
+        <div onClick={() => setHeroLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.92)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "zoom-out" }}>
+          <img src={heroLightbox} alt="Photo" style={{ maxWidth: "92vw", maxHeight: "88vh", objectFit: "contain", borderRadius: 8, boxShadow: "0 8px 64px rgba(0,0,0,0.9)" }} />
+        </div>
+      )}
+
       {/* ── Hero ── */}
       <div style={{ borderBottom: `1px solid ${tokens.border}` }}>
-        <div style={{ position: "relative", width: "100%", height: isMobile ? 200 : 460, overflow: "hidden", background: "#0a0a0a" }}>
+        <div style={{ position: "relative", width: "100%", height: isMobile ? 200 : 460, overflow: "hidden", background: tokens.bg }}>
           {profile.coverImage && (
-            <img src={profile.coverImage} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} />
+            <img src={profile.coverImage} alt="" onClick={() => setHeroLightbox(profile.coverImage!)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block", cursor: "zoom-in" }} />
           )}
           {isMobile && <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.88) 100%)" }} />}
           {editMode && !previewMode && (
@@ -285,19 +297,30 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
 
             {/* Avatar */}
             <div style={{ position: "relative", flexShrink: 0 }}>
+              <style>{`@keyframes bsPulse{0%,100%{box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 0 0 ${tokens.accent}55}50%{box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 0 8px ${tokens.accent}00}}`}</style>
               <div style={{
                 width: isMobile ? 90 : 200, height: isMobile ? 90 : 200,
                 borderRadius: 8,
                 background: isLt ? "#d8d8d8" : "#1a1a1a",
                 border: `3px solid ${tokens.bg}`, overflow: "hidden",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 24px rgba(0,0,0,0.6)",
+                animation: "bsPulse 3s ease-in-out infinite",
               }}>
                 {profile.heroImage
-                  ? <img src={profile.heroImage} alt={profile.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ? <img src={profile.heroImage} alt={profile.name} onClick={() => setHeroLightbox(profile.heroImage!)} style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "zoom-in" }} />
                   : <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={tokens.muted2} strokeWidth="0.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
                 }
               </div>
+              {profile.founderBadge && (
+                <div title="Founding Artist" style={{
+                  position: "absolute", top: -8, right: -8,
+                  width: 28, height: 28, borderRadius: "50%",
+                  background: "linear-gradient(135deg,#f0d080,#c8922a)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 2px 8px rgba(200,146,42,0.6)",
+                  fontSize: 14, zIndex: 2,
+                }}>🏆</div>
+              )}
               {editMode && !previewMode && (
                 <div style={{ position: "absolute", bottom: 4, right: 4, display: "flex", gap: 3 }}>
                   {profile.heroImage && (
@@ -379,10 +402,15 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
 
       {/* ── Sticky nav ── */}
       <div data-print-hide style={{
-        position: "sticky", top: 0, zIndex: 100,
-        background: isLt ? "rgba(245,245,245,0.94)" : "rgba(10,10,10,0.92)",
-        backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-        borderBottom: `1px solid ${tokens.border}`,
+        position: "sticky", top: 10, zIndex: 100,
+        margin: "10px 16px",
+        borderRadius: 14,
+        background: isLt
+          ? "linear-gradient(180deg, #f8f8f8 0%, #e4e4e4 100%)"
+          : `linear-gradient(180deg, #2e2c2c 0%, #1e1c1c 100%)`,
+        border: `1px solid rgba(255,255,255,0.10)`,
+        borderTop: `2px solid ${tokens.accent}ee`,
+        boxShadow: `0 20px 60px rgba(0,0,0,0.8), 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 ${tokens.accent}33`,
       }}>
         {isMobile ? (
           /* ── Mobile nav: active label + grid toggle ── */
@@ -404,16 +432,19 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
         ) : (
           /* ── Desktop nav: two scroll rows ── */
           <>
-        <div style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap", padding: "6px 32px 0", gap: "0.15rem" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", flexWrap: "wrap", padding: "12px 32px 0", gap: "0.15rem" }}>
           <div style={{ display: "flex", gap: "0.15rem", flexWrap: "wrap", flex: 1, alignItems: "center" }}>
             {NAV_PRIMARY.map(n => {
               const isActive = active === n.id;
               return (
-                <button key={n.id} onClick={() => setActive(n.id)} className={navStyles.tab} style={{
-                  ...lbl, color: isActive ? (isLt ? "#000" : "#fff") : tokens.muted,
-                  background: isActive ? (isLt ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.08)") : "transparent",
-                  padding: "5px 12px", borderRadius: 4, cursor: "pointer",
-                  border: "none", whiteSpace: "nowrap", marginBottom: 6,
+                <button key={n.id} onClick={() => setActive(n.id)} className={navStyles.tab} data-active={isActive ? "true" : undefined} style={{
+                  ...lbl, color: isActive ? "#fff" : tokens.muted,
+                  background: isActive ? tokens.accent : "transparent",
+                  boxShadow: isActive ? `0 0 12px ${tokens.accent}88` : "none",
+                  border: "none",
+                  padding: "5px 18px", borderRadius: 5, cursor: "pointer",
+                  whiteSpace: "nowrap", marginBottom: 4,
+                  transition: "all 0.15s ease",
                 }}>{n.label}</button>
               );
             })}
@@ -442,10 +473,11 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
               onClick={() => setShowDashboard(true)}
               title="Artist Dashboard"
               style={{
-                background: tokens.accent + "22",
-                border: `1px solid ${tokens.accent + "55"}`,
-                borderRadius: 6, padding: "5px 8px", marginRight: 16, flexShrink: 0,
-                cursor: "pointer", color: tokens.accent,
+                background: tokens.accent,
+                border: `1px solid ${tokens.accent}`,
+                boxShadow: `0 0 16px ${tokens.accent}66`,
+                borderRadius: 6, padding: "6px 14px", marginRight: 16, flexShrink: 0,
+                cursor: "pointer", color: "#fff", fontWeight: 600,
                 fontSize: "0.75rem", lineHeight: 1,
               }}
             >⚡ Dashboard</button>
@@ -453,22 +485,24 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
         </div>
 
         <div style={{
-          borderTop: `1px solid ${tokens.border2}`,
           display: "flex", alignItems: "center", flexWrap: "wrap",
-          padding: "6px 32px", gap: "0.15rem",
+          padding: "6px 32px 12px", gap: "0.15rem",
         }}>
           <span style={{ ...lbl, fontSize: "0.5rem", color: tokens.muted2, marginRight: "0.5rem", flexShrink: 0 }}>Industry</span>
           {NAV_PRO.map(n => {
             const isActive = active === n.id;
             const tabStyle: React.CSSProperties = {
               ...lbl,
-              color: isActive ? (isLt ? "#000" : "#fff") : tokens.muted,
-              background: isActive ? (isLt ? "rgba(0,0,0,0.07)" : "rgba(255,255,255,0.08)") : "transparent",
-              padding: "5px 12px", borderRadius: 4, cursor: "pointer",
-              textDecoration: "none", display: "inline-block", border: "none", whiteSpace: "nowrap",
+              color: isActive ? "#fff" : tokens.muted,
+              background: isActive ? tokens.accent : "transparent",
+              boxShadow: isActive ? `0 0 12px ${tokens.accent}88` : "none",
+              border: "none",
+              padding: "5px 18px", borderRadius: 5, cursor: "pointer",
+              textDecoration: "none", display: "inline-block",
+              whiteSpace: "nowrap", transition: "all 0.15s ease",
             };
-            if (n.href) return <Link key={n.id} href={n.href} className={navStyles.tab} style={tabStyle}>{n.label}</Link>;
-            return <button key={n.id} onClick={() => setActive(n.id)} className={navStyles.tab} style={tabStyle}>{n.label}</button>;
+            if (n.href) return <Link key={n.id} href={n.href} className={navStyles.tab} data-active={isActive ? "true" : undefined} style={tabStyle}>{n.label}</Link>;
+            return <button key={n.id} onClick={() => setActive(n.id)} className={navStyles.tab} data-active={isActive ? "true" : undefined} style={tabStyle}>{n.label}</button>;
           })}
           {artistUnlocked && (
             <button onClick={() => setActive("venue-crm")} style={{
@@ -486,19 +520,19 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
 
       {/* Edit mode banner */}
       {(editMode || defaultEditMode) && (
-        <div style={{ background: "#111", borderBottom: "1px solid #1e1e1e", padding: "7px 16px 7px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
-          <p style={{ ...lbl, color: "#555" }}>
+        <div style={{ background: "#1e1c1c", borderBottom: `1px solid ${tokens.accent}33`, padding: "8px 16px 8px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" }}>
+          <p style={{ ...lbl, color: tokens.muted }}>
             {previewMode ? "Audience view — this is what visitors see" : "Edit mode — click any field to edit · changes save automatically"}
           </p>
-          <div style={{ display: "flex", background: "#1a1a1a", border: "1px solid #2a2a2a", borderRadius: 6, padding: 3, gap: 2, flexShrink: 0 }}>
+          <div style={{ display: "flex", background: "#111", border: `1px solid ${tokens.accent}44`, borderRadius: 6, padding: 3, gap: 2, flexShrink: 0 }}>
             <button
               onClick={() => setPreviewMode(false)}
-              style={{ ...lbl, background: !previewMode ? tokens.accent : "transparent", color: !previewMode ? "#000" : "#666", border: "none", borderRadius: 4, padding: "4px 12px", cursor: "pointer", transition: "all 0.15s", letterSpacing: "0.08em" }}
-            >✏ Edit</button>
+              style={{ ...lbl, background: !previewMode ? tokens.accent : "transparent", color: !previewMode ? "#fff" : tokens.muted, border: "none", borderRadius: 4, padding: "5px 16px", cursor: "pointer", transition: "all 0.15s", letterSpacing: "0.08em", fontWeight: 700 }}
+            >✏ EDIT</button>
             <button
               onClick={() => setPreviewMode(true)}
-              style={{ ...lbl, background: previewMode ? "#444" : "transparent", color: previewMode ? "#d8d8d8" : "#666", border: "none", borderRadius: 4, padding: "4px 12px", cursor: "pointer", transition: "all 0.15s", letterSpacing: "0.08em" }}
-            >👁 Preview</button>
+              style={{ ...lbl, background: previewMode ? tokens.accent : "transparent", color: previewMode ? "#fff" : tokens.muted, border: "none", borderRadius: 4, padding: "5px 16px", cursor: "pointer", transition: "all 0.15s", letterSpacing: "0.08em", fontWeight: 700 }}
+            >👁 PREVIEW</button>
           </div>
         </div>
       )}
@@ -513,18 +547,19 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {active === "history"    && <HistorySection    profile={profile} tokens={tokens} />}
       {active === "videos"     && <VideosSection     profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "photos"     && <PhotoSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} supabaseSlug={supabaseSlug} />}
-      {active === "gear"       && <GearSection       profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
+      {active === "gear"       && <GearSection       profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} supabaseSlug={supabaseSlug} />}
       {active === "timeline"   && <TimelineSection   profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "press"      && <PressSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "stats"      && <StatsSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "merch"      && <MerchSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
-      {active === "epk"        && <EPKSection        profile={profile} tokens={tokens} />}
+      {active === "epk"        && <EPKSection        profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "links"      && <LinksSection      profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       {active === "tickets"    && <TicketsSection    profile={profile} tokens={tokens} />}
       {active === "mailing-list" && <MailingListSection profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} bandSlug={supabaseSlug} />}
       {active === "resources"  && <ResourcesSection  tokens={tokens} />}
       {active === "contact"    && <ContactSection    profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} stagePlotHref={stagePlotHref} />}
-      {active === "venue-crm"  && artistUnlocked && <VenueCRMSection profile={profile} tokens={tokens} onUpdate={onUpdate} />}
+      {active === "venue-crm"    && artistUnlocked && <VenueCRMSection    profile={profile} tokens={tokens} onUpdate={onUpdate} />}
+      {active === "venue-search" && artistUnlocked && <VenueSearchSection profile={profile} tokens={tokens} onUpdate={onUpdate} />}
       {active === "sync"       && <SyncSection       profile={profile} tokens={tokens} isArtist={(editMode || defaultEditMode) && !previewMode} onUpdate={onUpdate} />}
       </div>
 
@@ -545,7 +580,24 @@ export default function BandPage({ profileKey, defaultProfile, stagePlotHref, de
       {/* Footer */}
       <footer style={{ padding: "20px 40px", borderTop: `1px solid ${tokens.border}`, display: "flex", justifyContent: "space-between" }}>
         <p style={{ ...lbl, color: tokens.muted2 }}>{profile.name}{profile.founded ? ` · Est. ${profile.founded}` : ""}</p>
-        <p style={{ ...lbl, color: tokens.muted2 }}>bandwidth · powered by RMG</p>
+        <a href="https://bandstack-template.vercel.app" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+          <style>{`@keyframes bsShimmer{0%{background-position:-200% center}100%{background-position:200% center}}`}</style>
+          <span style={{
+            background: "linear-gradient(90deg,#6b6b6b 30%,#c8922a 48%,#f0d080 54%,#c8922a 60%,#6b6b6b 70%)",
+            backgroundSize: "200% auto",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            animation: "bsShimmer 4s linear infinite",
+            display: "inline",
+            fontFamily: "Inter, system-ui, sans-serif",
+            fontSize: "0.58rem",
+            letterSpacing: "0.13em",
+            textTransform: "uppercase",
+            fontWeight: 500,
+          }}>bandwidth</span>
+          <span style={{ color: tokens.muted2, fontFamily: "Inter, system-ui, sans-serif", fontSize: "0.58rem", letterSpacing: "0.13em", textTransform: "uppercase", fontWeight: 500 }}> · get your page</span>
+        </a>
       </footer>
     </main>
   );
